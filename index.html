@@ -6,6 +6,11 @@
     <title>Dashboard</title>
     <!-- Einbindung von Tailwind CSS für Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Einbindung der jspdf-Bibliotheken für PDF-Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         /* Setzt die Standard-Schriftart auf Inter und sorgt für eine fließende Höhe */
         body {
@@ -17,6 +22,10 @@
         /* Definiert eine schmale Schriftart für die Tabelle, falls auf mobilen Geräten benötigt */
         .table-font {
             font-size: 0.8rem;
+        }
+        /* Stellt sicher, dass das Modal über allem liegt */
+        .modal-overlay {
+            z-index: 50; 
         }
     </style>
 </head>
@@ -137,10 +146,19 @@
                     </table>
                 </div>
                 
-                <!-- Leeren Button -->
-                <div class="mt-4 flex justify-end">
-                     <button id="clear-table-button" class="px-4 py-2 text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition duration-300">
-                        Liste löschen
+                <!-- Buttons für Archivierung und PDF -->
+                <div class="mt-4 flex justify-between items-center">
+                    <div>
+                        <button id="archive-table-button" onclick="window.confirmArchive()" class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition duration-300 mr-4">
+                            Alles archivieren
+                        </button>
+                        <button id="pdf-save-button" onclick="window.generatePDF()" class="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-100 rounded-lg hover:bg-indigo-200 transition duration-300">
+                            Als PDF speichern (Gutschrift)
+                        </button>
+                    </div>
+                    <!-- Liste leeren (als Alternative zur Archivierung) -->
+                    <button id="clear-table-button" onclick="window.confirmClear()" class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300">
+                        Liste leeren
                     </button>
                 </div>
             </div>
@@ -193,6 +211,23 @@
             <p>&copy; <span id="year"></span> Ihr Unternehmen. Alle Rechte vorbehalten.</p>
         </div>
     </footer>
+    
+    <!-- NEU: Benutzerdefiniertes Bestätigungs-Modal (ersetzt prompt/confirm) -->
+    <div id="confirmation-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-4">Aktion bestätigen</h3>
+            <p id="modal-message" class="text-gray-600 mb-6">Sind Sie sicher, dass Sie diesen Vorgang durchführen möchten?</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="window.hideConfirmation(false)" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+                    Abbrechen
+                </button>
+                <button id="modal-confirm-button" onclick="window.hideConfirmation(true)" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150">
+                    Bestätigen
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- JavaScript für die Eingabelogik, Volumenberechnung und Tabelle -->
     <script>
@@ -202,6 +237,10 @@
         // Beim Laden wird versucht, Daten aus localStorage zu laden.
         let woodEntries = JSON.parse(localStorage.getItem('woodEntries')) || [];
         const saveButton = document.getElementById('save-button');
+        
+        // Temporäre Variable zur Speicherung der Funktion, die nach Bestätigung ausgeführt werden soll
+        let actionOnConfirm = null; 
+        let actionParam = null;
 
 
         // Speichert das aktuelle Array in localStorage
@@ -229,13 +268,13 @@
          */
         function getClassification(diameter) {
             if (diameter >= 25) {
-                return '2b+ (Starkholz)';
+                return '2b+';
             } else if (diameter >= 20) {
                 return '2a';
             } else if (diameter >= 15) {
                 return '1b';
             } else {
-                return 'UNKLAR (< 15 cm)';
+                return 'UNKLAR';
             }
         }
 
@@ -247,13 +286,13 @@
             tbody.innerHTML = '';
             let totalVolume = 0;
 
-            // Colspan ist jetzt 8 (7 Spalten + 1 Aktionsspalte)
+            // Colspan ist 8 (8 Spalten insgesamt)
             if (woodEntries.length === 0) {
                  const row = tbody.insertRow();
                  row.innerHTML = `<td colspan="8" class="px-3 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic">Noch keine Stämme erfasst.</td>`;
             }
 
-            woodEntries.forEach(entry => {
+            woodEntries.forEach((entry, index) => {
                 const row = tbody.insertRow();
                 row.className = 'hover:bg-gray-50 transition duration-100';
 
@@ -272,7 +311,7 @@
                 diameterCell.textContent = parseFloat(entry.durchmesser).toFixed(1);
                 diameterCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-right';
                 
-                // NEUE SPALTE: Klassifizierung (zentriert)
+                // Klassifizierung (zentriert)
                 const classCell = row.insertCell();
                 classCell.textContent = entry.classification;
                 classCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center font-semibold';
@@ -288,7 +327,7 @@
                 actionsCell.className = 'px-3 py-2 whitespace-nowrap text-right';
                 actionsCell.innerHTML = `
                     <button onclick="window.editEntry(${entry.id})" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium mr-2">Ändern</button>
-                    <button onclick="window.deleteEntry(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium">Löschen</button>
+                    <button onclick="window.confirmDelete(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium">Löschen</button>
                 `;
 
 
@@ -297,18 +336,268 @@
 
             totalVolumeElement.textContent = `${totalVolume.toFixed(3)} fm`;
         }
+        
+        // --- MODAL FUNKTIONEN (ersetzt prompt/confirm) ---
+
+        /**
+         * Zeigt das Bestätigungs-Modal an.
+         * @param {string} title - Titel des Modals.
+         * @param {string} message - Nachricht im Modal.
+         * @param {function} onConfirmAction - Funktion, die bei Bestätigung ausgeführt wird.
+         * @param {any} param - Optionaler Parameter für die Bestätigungsfunktion.
+         * @param {string} confirmText - Text für den Bestätigungsbutton.
+         */
+        window.showConfirmation = function(title, message, onConfirmAction, param = null, confirmText = 'Bestätigen') {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-confirm-button').textContent = confirmText;
+            document.getElementById('confirmation-modal').classList.remove('hidden');
+            actionOnConfirm = onConfirmAction;
+            actionParam = param;
+        }
+        
+        /**
+         * Versteckt das Bestätigungs-Modal und führt die Aktion aus (falls bestätigt).
+         * @param {boolean} confirmed - Wurde die Aktion bestätigt?
+         */
+        window.hideConfirmation = function(confirmed) {
+            document.getElementById('confirmation-modal').classList.add('hidden');
+            if (confirmed && actionOnConfirm) {
+                actionOnConfirm(actionParam);
+            }
+            // Variablen zurücksetzen
+            actionOnConfirm = null;
+            actionParam = null;
+        }
+        
+        // --- LÖSCH-Logik mit Modal ---
+
+        window.confirmDelete = function(id) {
+            window.showConfirmation(
+                'Stamm löschen', 
+                'Sind Sie sicher, dass Sie diesen Stamm aus der Liste entfernen möchten?', 
+                window.deleteEntry, 
+                id,
+                'Löschen'
+            );
+        }
 
         /**
          * Löscht einen Eintrag anhand seiner ID und speichert die Liste.
          * @param {number} id - Eindeutige ID des zu löschenden Eintrags.
          */
         window.deleteEntry = function(id) {
-            // Wichtig: window.confirm() wird durch die Laufzeitumgebung abgebildet
-            if (confirm('Sind Sie sicher, diesen Eintrag zu löschen?')) {
-                woodEntries = woodEntries.filter(e => e.id !== id);
-                saveEntries();
-                renderTable();
+            woodEntries = woodEntries.filter(e => e.id !== id);
+            saveEntries();
+            renderTable();
+            
+            // Feedback anzeigen
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = 'Stamm erfolgreich gelöscht!';
+            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+
+
+        // --- ARCHIVIERUNGS-Logik mit Modal ---
+
+        window.confirmArchive = function() {
+            if (woodEntries.length === 0) {
+                const feedback = document.getElementById('feedback-message');
+                feedback.textContent = 'Es gibt keine Stämme zum Archivieren.';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                return;
             }
+            window.showConfirmation(
+                'Alle Stämme archivieren', 
+                `Wollen Sie wirklich alle ${woodEntries.length} erfassten Stämme archivieren und die Liste leeren?`, 
+                window.handleArchive, 
+                null,
+                'Ja, archivieren'
+            );
+        }
+        
+        /**
+         * Archiviert die Liste (löscht alle Einträge).
+         */
+        window.handleArchive = function() {
+            woodEntries = [];
+            saveEntries();
+            renderTable();
+            
+            // Archivierungs-Erfolgsmeldung anzeigen
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = 'Liste erfolgreich archiviert und geleert!';
+            feedback.className = 'col-span-2 md:col-span-5 text-sm text-blue-600 font-medium';
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+        
+        // --- LISTE LEEREN Logik mit Modal ---
+        
+        window.confirmClear = function() {
+             if (woodEntries.length === 0) {
+                const feedback = document.getElementById('feedback-message');
+                feedback.textContent = 'Die Liste ist bereits leer.';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                return;
+            }
+            window.showConfirmation(
+                'Liste leeren', 
+                'Sind Sie sicher, dass Sie alle Stämme OHNE Archivierung löschen möchten?', 
+                window.handleClear, 
+                null,
+                'Ja, löschen'
+            );
+        }
+
+        /**
+         * Löscht alle Einträge ohne Archivierung.
+         */
+        window.handleClear = function() {
+            woodEntries = [];
+            saveEntries();
+            renderTable();
+            
+            // Erfolgsmeldung anzeigen
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = 'Liste erfolgreich geleert!';
+            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+
+        // --- PDF Generierung ---
+
+        /**
+         * Erzeugt eine PDF-Datei (Gutschrift) mit Zusammenfassung und Stammliste.
+         */
+        window.generatePDF = function() {
+            // Überprüft, ob Einträge vorhanden sind
+            if (woodEntries.length === 0) {
+                const feedback = document.getElementById('feedback-message');
+                feedback.textContent = 'Keine Einträge vorhanden, um eine Gutschrift zu erstellen.';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                return;
+            }
+
+            // Stellt sicher, dass die PDF-Bibliotheken geladen sind
+            if (typeof window.jspdf === 'undefined' || typeof window.jspdf.AcroForm === 'undefined') {
+                const feedback = document.getElementById('feedback-message');
+                feedback.textContent = 'Fehler: PDF-Bibliotheken nicht geladen. Versuchen Sie es erneut.';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 4000);
+                return;
+            }
+            
+            // Initialisiert jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 15;
+            const margin = 15;
+            
+            // --- 1. Titel & Datum ---
+            doc.setFontSize(24);
+            doc.text("Gutschrift", margin, y);
+            y += 10;
+            
+            doc.setFontSize(10);
+            doc.text(`Erstellt am: ${new Date().toLocaleDateString('de-DE')} | Gesamte Stämme: ${woodEntries.length}`, margin, y);
+            y += 10;
+            
+            // --- 2. Klassifizierungs-Zusammenfassung ---
+            doc.setFontSize(16);
+            doc.text("Volumen-Zusammenfassung nach Klassifizierung", margin, y);
+            y += 5;
+
+            // Berechnet die Summe pro Klassifizierung
+            const summary = woodEntries.reduce((acc, entry) => {
+                const key = entry.classification;
+                acc[key] = (acc[key] || 0) + entry.festmeter;
+                return acc;
+            }, {});
+            
+            // Bereitet die Daten für die Zusammenfassungstabelle vor und sortiert sie
+            const summaryTableData = Object.entries(summary)
+                .map(([classification, volume]) => [
+                    classification,
+                    volume.toFixed(3) + ' fm'
+                ])
+                .sort((a, b) => a[0].localeCompare(b[0])); // Sortiert alphabetisch nach Klassifizierung
+
+            // Gesamtvolumen berechnen
+            const totalVolume = summaryTableData.reduce((sum, row) => sum + parseFloat(row[1]), 0);
+
+            doc.autoTable({
+                startY: y,
+                head: [['Klassifizierung', 'Gesamtvolumen (fm)']],
+                body: summaryTableData,
+                foot: [['Gesamt', totalVolume.toFixed(3) + ' fm']],
+                theme: 'striped',
+                styles: { fontSize: 10 },
+                headStyles: { fillColor: [50, 50, 80], halign: 'center' },
+                footStyles: { fillColor: [200, 200, 200], fontStyle: 'bold' },
+                columnStyles: { 1: { halign: 'right' } }
+            });
+
+            y = doc.autoTable.previous.finalY + 15;
+
+            // --- 3. Detaillierte Stammliste ---
+            doc.setFontSize(16);
+            doc.text("Detaillierte Stammliste", margin, y);
+            y += 5;
+            
+            // Bereitet die Daten für die Detailtabelle vor
+            const detailTableHead = [
+                'ID', 
+                'Kunde', 
+                'Holzart', 
+                'Qualität', 
+                'Länge (m)', 
+                'Ø (cm)', 
+                'Klass.', 
+                'Festmeter (fm)'
+            ];
+            
+            const detailTableBody = woodEntries.map((entry, index) => [
+                index + 1, // Einfache lfd. ID für das PDF
+                entry.kunde,
+                entry.holzart,
+                entry.qualitaet,
+                entry.laenge.toFixed(2),
+                entry.durchmesser.toFixed(1),
+                entry.classification,
+                entry.festmeter.toFixed(3)
+            ]);
+
+            doc.autoTable({
+                startY: y,
+                head: [detailTableHead],
+                body: detailTableBody,
+                theme: 'grid',
+                styles: { fontSize: 8 },
+                headStyles: { fillColor: [100, 100, 100] },
+                columnStyles: { 
+                    4: { halign: 'right' }, 
+                    5: { halign: 'right' }, 
+                    7: { halign: 'right' } 
+                },
+                didDrawPage: (data) => {
+                    doc.setFontSize(8);
+                    doc.text("Seite " + doc.internal.getNumberOfPages(), data.settings.margin.left, doc.internal.pageSize.height - 5);
+                }
+            });
+
+            // Speichern der PDF
+            doc.save(`Gutschrift_Holzvermessung_${new Date().toISOString().slice(0, 10)}.pdf`);
         }
 
         /**
@@ -359,7 +648,6 @@
             const durchmesserInput = document.getElementById('durchmesser');
             const form = document.getElementById('wood-entry-form');
             const feedback = document.getElementById('feedback-message');
-            const clearButton = document.getElementById('clear-table-button');
             const editingIdInput = document.getElementById('editing-id');
 
 
@@ -402,7 +690,7 @@
                 }
 
                 const festmeter = calculateVolume(laenge, durchmesser);
-                const classification = getClassification(durchmesser); // NEUE KLASSIFIZIERUNG
+                const classification = getClassification(durchmesser); // KLASSIFIZIERUNG
 
                 const newEntry = {
                     kunde: document.getElementById('kunde').value || 'Unbekannt',
@@ -448,21 +736,6 @@
                 laengeInput.select();
             });
             
-            // Event-Listener für den "Liste löschen" Button
-            clearButton.addEventListener('click', () => {
-                if (woodEntries.length > 0 && confirm("Sind Sie sicher, dass Sie alle erfassten Stämme löschen möchten?")) {
-                    woodEntries = [];
-                    saveEntries();
-                    renderTable();
-                    
-                    document.getElementById('feedback-message').textContent = 'Liste erfolgreich gelöscht!';
-                    document.getElementById('feedback-message').className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
-                    document.getElementById('feedback-message').classList.remove('hidden');
-                    setTimeout(() => document.getElementById('feedback-message').classList.add('hidden'), 3000);
-                }
-            });
-
-
             // Initialer Aufruf, um die Tabelle beim Laden mit gespeicherten Daten zu befüllen
             renderTable();
             
