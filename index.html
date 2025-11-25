@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holzrechner Dashboard (Netto/Brutto nur in PDF)</title>
+    <title>Holzrechner Dashboard (Archivierungs-Fix)</title>
     <!-- Einbindung von Tailwind CSS für Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -175,6 +175,7 @@
                         <button id="pdf-save-button" onclick="window.generatePDF()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition duration-300 shadow-md">
                             Gutschrift als PDF
                         </button>
+                        <!-- Der "Liste archivieren"-Button, der window.confirmArchive() aufruft. -->
                         <button id="archive-table-button" onclick="window.confirmArchive()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-blue-700 bg-blue-100 rounded-xl hover:bg-blue-200 transition duration-300">
                             Liste archivieren
                         </button>
@@ -399,8 +400,6 @@
             });
 
             totalVolumeElement.textContent = `${totalVolume.toFixed(3)} fm`;
-            // totalPriceNettoElement.textContent = `${totalNettoPrice.toFixed(2)} €`; // Nicht mehr in Tabelle
-            // totalPriceBruttoElement.textContent = `${totalBruttoPrice.toFixed(2)} €`; // Nicht mehr in Tabelle
         }
         
         // --- MODAL FUNKTIONEN (ersetzt prompt/confirm) ---
@@ -470,7 +469,7 @@
         }
 
 
-        // --- ARCHIVIERUNGS-Logik mit Modal (NEUE LOGIK) ---
+        // --- ARCHIVIERUNGS-Logik mit Modal ---
 
         window.confirmArchive = function() {
             if (woodEntries.length === 0) {
@@ -484,6 +483,7 @@
             // Berechnung des Bruttopreises für die Anzeige im Modal
             const totalBruttoPrice = woodEntries.reduce((sum, entry) => sum + entry.bruttoPrice, 0);
             
+            // Wichtig: window.handleArchive als Callback übergeben
             window.showConfirmation(
                 'Alle Stämme archivieren', 
                 `Wollen Sie wirklich alle ${woodEntries.length} erfassten Stämme (Gesamtpreis Brutto: ${totalBruttoPrice.toFixed(2)} €) archivieren und die Liste leeren? Die Daten sind danach im Archiv einsehbar.`, 
@@ -531,6 +531,7 @@
             const feedback = document.getElementById('feedback-message');
             feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalBruttoPrice} € Brutto) und geleert!`;
             feedback.className = 'col-span-2 md:col-span-7 text-sm text-blue-600 font-semibold';
+            feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 5000);
         }
         
@@ -653,11 +654,12 @@
             // Berechnet die Summe pro Klassifizierung
             const summary = woodEntries.reduce((acc, entry) => {
                 const key = entry.classification;
+                // Wichtig: entry.mwstAmount ist jetzt im Objekt gespeichert
                 acc[key] = {
                     volume: (acc[key]?.volume || 0) + entry.festmeter,
                     netto: (acc[key]?.netto || 0) + entry.nettoPrice,
                     brutto: (acc[key]?.brutto || 0) + entry.bruttoPrice,
-                    mwst: (acc[key]?.mwst || 0) + entry.mwstAmount // MwSt. Betrag
+                    mwst: (acc[key]?.mwst || 0) + entry.mwstAmount 
                 };
                 return acc;
             }, {});
@@ -881,7 +883,7 @@
 
                 const festmeter = calculateVolume(laenge, durchmesser);
                 const classification = getClassification(durchmesser); 
-                const { brutto, netto, mwst } = calculateTotalPrice(festmeter, holzart, qualitaet); // NEU: Brutto/Netto/MwSt
+                const { brutto, netto, mwst } = calculateTotalPrice(festmeter, holzart, qualitaet); 
 
                 const newEntry = {
                     kunde: document.getElementById('kunde').value || 'Unbekannt',
