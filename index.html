@@ -640,8 +640,8 @@
             document.getElementById('editing-id').value = '';
             
             // Setzt nur Länge und Durchmesser zurück 
-            document.getElementById('laenge').value = '';
-            document.getElementById('durchmesser').value = '';
+            // WICHTIG: Hier wird nichts zurückgesetzt, da die Formularwerte beim Speichern 
+            // gemäß der neuen Logik direkt manipuliert werden.
             
             // Schaltfläche zurücksetzen
             saveButton.textContent = 'Stamm speichern (oder Enter in Mitteldurchmesser)';
@@ -707,6 +707,8 @@
                     festmeter: festmeter,
                     classification: classification // KLASSIFIZIERUNG SPEICHERN
                 };
+                
+                let originalLaenge = laengeInput.value; // Speichert den Wert der Länge vor dem Reset
 
                 if (isEditing) {
                     // Bearbeiten
@@ -717,12 +719,20 @@
                         woodEntries[index] = { ...newEntry, id: id };
                         feedback.textContent = 'Eintrag erfolgreich aktualisiert!';
                     }
+                    // Nach Bearbeitung Formular zurücksetzen, da es sich meist um einen einzelnen Korrekturvorgang handelt
                     resetFormForNewEntry(); 
+                    // Setzt den Fokus nach der Bearbeitung auf das Kundenfeld, um die Eingabesequenz neu zu starten
+                    document.getElementById('kunde').focus();
                 } else {
                     // Neuer Eintrag
                     newEntry.id = Date.now(); 
                     woodEntries.push(newEntry);
                     feedback.textContent = 'Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!';
+                    
+                    // NEUE LOGIK: Länge beibehalten und Durchmesser zurücksetzen
+                    durchmesserInput.value = ''; // Durchmesser löschen
+                    laengeInput.value = originalLaenge; // Länge beibehalten
+                    durchmesserInput.focus(); // Fokus auf Durchmesser setzen
                 }
 
 
@@ -737,9 +747,9 @@
                 // Feedback nach 3 Sekunden ausblenden
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
                 
-                // Fokus auf Länge setzen und Wert auswählen, um die Eingabe fortzusetzen
-                laengeInput.focus(); 
-                laengeInput.select();
+                // Das Fokus-Management erfolgt nun in der if/else-Logik,
+                // um zwischen neuem Eintrag (fokus auf durchmesser) und
+                // bearbeiten (fokus auf kunde) zu unterscheiden.
             });
             
             // Initialer Aufruf
