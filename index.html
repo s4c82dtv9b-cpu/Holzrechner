@@ -469,7 +469,7 @@
         }
 
 
-        // --- ARCHIVIERUNGS-Logik mit Modal ---
+        // --- ARCHIVIERUNGS-Logik mit Modal (HIER IST DER FIX WICHTIG) ---
 
         window.confirmArchive = function() {
             if (woodEntries.length === 0) {
@@ -502,8 +502,16 @@
             // Lade das Archiv (oder leeres Array)
             const archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
             
-            // Erstelle Zeitstempel und berechne Gesamtvolumen & Preis
-            const timestamp = new Date().toLocaleDateString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
+            // Korrigiert den Fehler: Kombination von dateStyle und timeStyle in toLocaleDateString ist ungültig.
+            // Verwenden stattdessen toLocaleString mit expliziten Optionen für Datum und Uhrzeit.
+            const timestamp = new Date().toLocaleString('de-DE', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
             const totalVolume = currentEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
             const totalNettoPrice = currentEntries.reduce((sum, entry) => sum + entry.nettoPrice, 0);
             const totalBruttoPrice = currentEntries.reduce((sum, entry) => sum + entry.bruttoPrice, 0);
@@ -520,8 +528,8 @@
             
             // Füge die neue Sitzung vorne hinzu
             archivedEntries.unshift(archiveSession); 
-            localStorage.setItem('archivedEntries', JSON.stringify(archivedEntries));
-
+            localStorage.setItem('archivedEntries', JSON.stringify(archivedEntries)); // WICHTIG: Speichert das Archiv
+            
             // Leere die aktuelle Liste und speichere
             woodEntries = [];
             saveEntries();
@@ -529,7 +537,7 @@
             
             // Archivierungs-Erfolgsmeldung anzeigen
             const feedback = document.getElementById('feedback-message');
-            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalBruttoPrice} € Brutto) und geleert!`;
+            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalBruttoPrice} € Brutto) und geleert! Gehen Sie jetzt zum Archiv-Tab.`;
             feedback.className = 'col-span-2 md:col-span-7 text-sm text-blue-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 5000);
