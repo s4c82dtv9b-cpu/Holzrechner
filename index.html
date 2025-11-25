@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Holzrechner Dashboard</title>
     <!-- Einbindung von Tailwind CSS für Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -32,31 +32,33 @@
 <body class="bg-gray-50 text-gray-800">
 
     <!-- Navigationsleiste -->
-    <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
-        <div class="container mx-auto flex justify-between items-center">
+    <nav class="bg-white shadow-xl p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
             <!-- Logo oder Markenname -->
-            <a href="index.html" class="text-xl font-bold text-indigo-600">Sägewerk Mülleder</a>
+            <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
             <!-- Navigationslinks mit ARCHIV -->
-            <div class="flex space-x-4">
-                <a href="index.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition duration-300 border-b-2 border-indigo-600 pb-1">Dashboard</a>
-                <a href="archiv.html" class="text-gray-600 hover:text-indigo-600 font-semibold transition duration-300">Archiv</a>
-                <a href="kunden.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Kunden</a>
-                <a href="preise.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Preise</a>
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Dashboard</a>
+                <a href="archiv.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Archiv</a>
+                <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
+                <a href="preise.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Preise</a>
             </div>
         </div>
     </nav>
 
     <!-- Hauptinhalt (Dashboard Ansicht) -->
-    <main class="flex-grow container mx-auto p-8">
-        <div class="w-full max-w-5xl mx-auto">
-            <!-- TITEL WIE GEWÜNSCHT GEÄNDERT UND GRÜN MARKIERT -->
+    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+        <div class="w-full mx-auto">
+            <!-- HAUPTTITEL FÜR DIE SEITE -->
             <h1 class="text-4xl font-extrabold text-green-700 mb-8 text-center sm:text-left">
                 Holzrechner Sägewerk Mülleder
             </h1>
 
-            <!-- SEKTION: Schnelle Datenerfassung für Holzstämme -->
-            <div class="bg-white p-8 shadow-xl rounded-xl w-full mb-8 border-t-4 border-indigo-500">
-                <h2 class="text-3xl font-bold text-indigo-700 mb-6">Schnelle Stammdaten erfassen</h2>
+            <!-- SEKTION: Holzrechner (Ehemals Schnelle Stammdaten erfassen) -->
+            <div class="bg-white p-6 sm:p-10 shadow-2xl rounded-xl w-full mb-10 border-t-6 border-blue-600">
+                
+                <!-- ÜBERSCHRIFT WIE GEWÜNSCHT GEÄNDERT -->
+                <h2 class="text-3xl font-bold text-blue-700 mb-8">Holzrechner</h2>
                 
                 <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-5 gap-6 items-end">
                     
@@ -65,14 +67,14 @@
                     
                     <!-- Feld: Kunde -->
                     <div class="col-span-2 md:col-span-1">
-                        <label for="kunde" class="block text-sm font-medium text-gray-700">Kunde</label>
-                        <input type="text" id="kunde" name="kunde" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border" placeholder="Name des Kunden">
+                        <label for="kunde" class="block text-sm font-semibold text-gray-700">Kunde</label>
+                        <input type="text" id="kunde" name="kunde" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="Name des Kunden">
                     </div>
                     
                     <!-- Feld: Holzart -->
                     <div class="col-span-1">
-                        <label for="holzart" class="block text-sm font-medium text-gray-700">Holzart</label>
-                        <select id="holzart" name="holzart" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border bg-white">
+                        <label for="holzart" class="block text-sm font-semibold text-gray-700">Holzart</label>
+                        <select id="holzart" name="holzart" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
                             <option value="Fichte">Fichte</option>
                             <option value="Tanne">Tanne</option>
                             <option value="Eiche">Eiche</option>
@@ -83,8 +85,8 @@
                     
                     <!-- Feld: Qualität (ehemals Holzklasse) -->
                     <div class="col-span-1">
-                        <label for="qualitaet" class="block text-sm font-medium text-gray-700">Qualität</label>
-                        <select id="qualitaet" name="qualitaet" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border bg-white">
+                        <label for="qualitaet" class="block text-sm font-semibold text-gray-700">Qualität</label>
+                        <select id="qualitaet" name="qualitaet" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
                             <option value="A/B">A/B</option>
                             <option value="B-Braunkern">B (Braunkern)</option>
                             <option value="CX">CX</option>
@@ -94,129 +96,92 @@
                     
                     <!-- Feld: Länge (mit Enter-Funktion) -->
                     <div class="col-span-1">
-                        <label for="laenge" class="block text-sm font-medium text-gray-700">Länge (m)</label>
-                        <input type="number" step="0.01" id="laenge" name="laenge" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border" placeholder="z.B. 4.0">
+                        <label for="laenge" class="block text-sm font-semibold text-gray-700">Länge (m)</label>
+                        <input type="number" step="0.01" id="laenge" name="laenge" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 4.0">
                     </div>
 
                     <!-- Feld: Mitteldurchmesser (mit Enter-Funktion) -->
                     <div class="col-span-1">
-                        <label for="durchmesser" class="block text-sm font-medium text-gray-700">Mitteldurchmesser (cm)</label>
-                        <input type="number" step="0.1" id="durchmesser" name="durchmesser" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border" placeholder="z.B. 25.5">
+                        <label for="durchmesser" class="block text-sm font-semibold text-gray-700">Mitteldurchmesser (cm)</label>
+                        <input type="number" step="0.1" id="durchmesser" name="durchmesser" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 25.5">
                     </div>
 
-                    <!-- Button: Speichern (wird hauptsächlich durch Enter ausgelöst) -->
-                    <div class="col-span-2 md:col-span-5 flex justify-end">
-                        <button type="submit" id="save-button" class="w-full sm:w-auto px-8 py-2.5 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300">
-                            Stamm speichern (oder Enter in Mitteldurchmesser)
+                    <!-- Button: Speichern -->
+                    <div class="col-span-2 md:col-span-5 flex justify-end mt-4">
+                        <button type="submit" id="save-button" class="w-full sm:w-auto px-10 py-3 text-base font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-md hover:shadow-lg">
+                            Stamm speichern (oder Enter in Ø)
                         </button>
                     </div>
                     
                     <!-- Feedback Message -->
-                    <div id="feedback-message" class="col-span-2 md:col-span-5 text-sm text-green-600 font-medium hidden">Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!</div>
+                    <div id="feedback-message" class="col-span-2 md:col-span-5 text-sm font-semibold hidden pt-2"></div>
                 </form>
             </div>
             
-            <!-- NEUE SEKTION: Eingegebene Stämme Tabelle -->
-            <div class="bg-white p-8 shadow-xl rounded-xl w-full mb-12">
-                <h2 class="text-3xl font-bold text-gray-700 mb-6">Erfasste Stämme</h2>
+            <!-- SEKTION: Eingegebene Stämme Tabelle -->
+            <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-12 border-t-6 border-gray-300">
+                <h2 class="text-3xl font-bold text-gray-700 mb-6">Erfasste Stämme & Gutschrifts-Daten</h2>
                 
-                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
                     <table class="min-w-full divide-y divide-gray-200 table-font">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-gray-100">
                             <tr>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kunde</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holzart</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qualität</th>
-                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Länge (m)</th>
-                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ø (cm)</th>
-                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Klassifizierung</th>
-                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Festmeter (fm)</th>
-                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
+                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kunde</th>
+                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Holzart</th>
+                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Länge (m)</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Ø (cm)</th>
+                                <th class="px-3 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Klassifizierung</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Festmeter (fm)</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
                             </tr>
                         </thead>
-                        <tbody id="wood-table-body" class="bg-white divide-y divide-gray-200">
+                        <tbody id="wood-table-body" class="bg-white divide-y divide-gray-100">
                             <!-- Einträge werden hier dynamisch eingefügt -->
                         </tbody>
                         <tfoot>
-                            <tr class="bg-gray-100 font-bold">
+                            <tr class="bg-blue-50 font-extrabold border-t-2 border-blue-200">
                                 <!-- Colspan auf 6 erhöht (Kunde, Holzart, Qualität, Länge, Ø, Klassifizierung) -->
-                                <td colspan="6" class="px-3 py-2 text-right text-sm text-gray-800">Gesamtvolumen:</td>
-                                <td id="total-volume" class="px-3 py-2 text-right text-sm text-indigo-700">0.000 fm</td>
-                                <td class="px-3 py-2"></td>
+                                <td colspan="6" class="px-3 py-3 text-right text-sm text-blue-800">Gesamtvolumen:</td>
+                                <td id="total-volume" class="px-3 py-3 text-right text-sm text-blue-700">0.000 fm</td>
+                                <td class="px-3 py-3"></td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
                 
                 <!-- Buttons für Archivierung und PDF -->
-                <div class="mt-4 flex justify-between items-center">
-                    <div>
-                        <button id="archive-table-button" onclick="window.confirmArchive()" class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition duration-300 mr-4">
-                            Alles archivieren
+                <div class="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+                    <div class="flex space-x-3 w-full sm:w-auto">
+                        <button id="pdf-save-button" onclick="window.generatePDF()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition duration-300 shadow-md">
+                            Gutschrift als PDF
                         </button>
-                        <button id="pdf-save-button" onclick="window.generatePDF()" class="px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-100 rounded-lg hover:bg-indigo-200 transition duration-300">
-                            Als PDF speichern (Gutschrift)
+                        <button id="archive-table-button" onclick="window.confirmArchive()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-blue-700 bg-blue-100 rounded-xl hover:bg-blue-200 transition duration-300">
+                            Liste archivieren
                         </button>
                     </div>
                     <!-- Liste leeren (als Alternative zur Archivierung) -->
-                    <button id="clear-table-button" onclick="window.confirmClear()" class="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300">
-                        Liste leeren
+                    <button id="clear-table-button" onclick="window.confirmClear()" class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-300 border border-gray-200">
+                        Liste leeren (Verlust!)
                     </button>
                 </div>
             </div>
 
-            <!-- Bestehende Dashboard Karten (Zugriff auf Kunden und Preise) -->
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Übersichten</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <!-- Dashboard Card 1: Kunden -->
-                <a href="kunden.html" class="block bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-b-4 border-indigo-500">
-                    <div class="flex items-start space-x-4">
-                        <svg class="w-10 h-10 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2a3 3 0 00-5.356-1.857M9 20V8m3.934 1.5l.399 2.074-2.22 1.354 2.22 1.354-.399 2.074M6 20V8m0 0v12m3-12h2m-2 0h-2M9 8h2m-2 0H7"></path></svg>
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Kunden & Testimonials</h2>
-                            <p class="text-gray-600">
-                                Sehen Sie sich unsere Partner und Referenzen an. Hier finden Sie alle Erfolgsgeschichten unserer Kunden.
-                            </p>
-                            <span class="mt-4 inline-block text-indigo-500 font-semibold hover:text-indigo-700">
-                                Zur Kundenseite →
-                            </span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Dashboard Card 2: Preise -->
-                <a href="preise.html" class="block bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 border-b-4 border-indigo-500">
-                    <div class="flex items-start space-x-4">
-                        <svg class="w-10 h-10 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Preise & Tarife</h2>
-                            <p class="text-gray-600">
-                                Entdecken Sie unsere verschiedenen Pakete und finden Sie den passenden Tarif für Ihre Bedürfnisse.
-                            </p>
-                            <span class="mt-4 inline-block text-indigo-500 font-semibold hover:text-indigo-700">
-                                Zur Preisübersicht →
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            <!-- ANMERKUNG: Die Sektion "Übersichten" wurde entfernt, wie gewünscht. -->
             
         </div>
     </main>
 
     <!-- Fußzeile -->
-    <footer class="bg-gray-800 text-white p-4 mt-auto">
+    <footer class="bg-gray-800 text-white p-6 mt-auto">
         <div class="container mx-auto text-center text-sm">
-            <!-- Das Jahr wird dynamisch eingefügt -->
             <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
         </div>
     </footer>
     
-    <!-- NEU: Benutzerdefiniertes Bestätigungs-Modal (ersetzt prompt/confirm) -->
-    <div id="confirmation-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
-        <div class="bg-white rounded-lg shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100">
+    <!-- Benutzerdefiniertes Bestätigungs-Modal (ersetzt prompt/confirm) -->
+    <div id="confirmation-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100">
             <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-4">Aktion bestätigen</h3>
             <p id="modal-message" class="text-gray-600 mb-6">Sind Sie sicher, dass Sie diesen Vorgang durchführen möchten?</p>
             <div class="flex justify-end space-x-3">
@@ -283,12 +248,12 @@
             // Colspan ist 8 (8 Spalten insgesamt)
             if (woodEntries.length === 0) {
                  const row = tbody.insertRow();
-                 row.innerHTML = `<td colspan="8" class="px-3 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic">Noch keine Stämme erfasst.</td>`;
+                 row.innerHTML = `<td colspan="8" class="px-3 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic bg-white">Noch keine Stämme erfasst.</td>`;
             }
 
             woodEntries.forEach((entry, index) => {
                 const row = tbody.insertRow();
-                row.className = 'hover:bg-gray-50 transition duration-100';
+                row.className = 'hover:bg-blue-50 transition duration-100';
 
                 // Füllt die Zeilen mit Daten
                 row.insertCell().textContent = entry.kunde;
@@ -314,14 +279,14 @@
                 // Festmeter (rechtsbündig und hervorgehoben)
                 const volumeCell = row.insertCell();
                 volumeCell.textContent = entry.festmeter.toFixed(3);
-                volumeCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-medium text-indigo-700 bg-indigo-50 text-right';
+                volumeCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-bold text-blue-700 bg-blue-100 text-right';
 
                 // Aktionen
                 const actionsCell = row.insertCell();
                 actionsCell.className = 'px-3 py-2 whitespace-nowrap text-right';
                 actionsCell.innerHTML = `
-                    <button onclick="window.editEntry(${entry.id})" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium mr-2">Ändern</button>
-                    <button onclick="window.confirmDelete(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium">Löschen</button>
+                    <button onclick="window.editEntry(${entry.id})" class="text-blue-600 hover:text-blue-900 text-sm font-medium mr-2 transition duration-150">Ändern</button>
+                    <button onclick="window.confirmDelete(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium transition duration-150">Löschen</button>
                 `;
 
 
@@ -340,6 +305,17 @@
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
             document.getElementById('modal-confirm-button').textContent = confirmText;
+            
+            // Setzt die Farbe des Bestätigungsbuttons je nach Aktion (Rot für Löschen/Verlust, Blau für Archivieren)
+            const confirmButton = document.getElementById('modal-confirm-button');
+            confirmButton.classList.remove('bg-red-600', 'hover:bg-red-700', 'bg-blue-600', 'hover:bg-blue-700');
+
+            if (confirmText.includes('Löschen') || confirmText.includes('endgültig')) {
+                 confirmButton.classList.add('bg-red-600', 'hover:bg-red-700');
+            } else {
+                 confirmButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+
             document.getElementById('confirmation-modal').classList.remove('hidden');
             actionOnConfirm = onConfirmAction;
             actionParam = param;
@@ -366,7 +342,7 @@
                 'Sind Sie sicher, dass Sie diesen Stamm aus der Liste entfernen möchten?', 
                 window.deleteEntry, 
                 id,
-                'Löschen'
+                'Ja, Löschen'
             );
         }
 
@@ -381,7 +357,7 @@
             // Feedback anzeigen
             const feedback = document.getElementById('feedback-message');
             feedback.textContent = 'Stamm erfolgreich gelöscht!';
-            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 3000);
         }
@@ -393,7 +369,7 @@
             if (woodEntries.length === 0) {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Es gibt keine Stämme zum Archivieren.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
                 return;
@@ -440,7 +416,7 @@
             // Archivierungs-Erfolgsmeldung anzeigen
             const feedback = document.getElementById('feedback-message');
             feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalVolume} fm) und geleert!`;
-            feedback.className = 'col-span-2 md:col-span-5 text-sm text-blue-600 font-medium';
+            feedback.className = 'col-span-2 md:col-span-5 text-sm text-blue-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 5000);
         }
@@ -451,14 +427,14 @@
              if (woodEntries.length === 0) {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Die Liste ist bereits leer.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
                 return;
             }
             window.showConfirmation(
-                'Liste leeren', 
-                'Sind Sie sicher, dass Sie alle Stämme OHNE Archivierung löschen möchten? Diese Daten gehen dann verloren!', 
+                'Liste endgültig leeren', 
+                'Sind Sie sicher, dass Sie alle Stämme OHNE Archivierung löschen möchten? Diese Daten gehen dann verloren und können NICHT wiederhergestellt werden!', 
                 window.handleClear, 
                 null,
                 'Ja, endgültig löschen'
@@ -476,7 +452,7 @@
             // Erfolgsmeldung anzeigen
             const feedback = document.getElementById('feedback-message');
             feedback.textContent = 'Liste erfolgreich geleert!';
-            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 3000);
         }
@@ -491,7 +467,7 @@
             if (woodEntries.length === 0) {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Keine Einträge vorhanden, um eine Gutschrift zu erstellen.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 4000);
                 return;
@@ -501,7 +477,7 @@
             if (typeof window.jspdf === 'undefined' || typeof window.jspdf.AcroForm === 'undefined') {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Fehler: PDF-Bibliotheken nicht geladen. Versuchen Sie es erneut.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 4000);
                 return;
@@ -514,45 +490,50 @@
             const today = new Date().toLocaleDateString('de-DE');
             const mainCustomer = woodEntries[0].kunde || "Unbekannter Kunde"; // Hauptkunde
 
-            // --- 1. HEADER / BRANDING ---
+            // --- 1. HEADER / BRANDING (Modernisiert) ---
             
             // Hintergrund für den Header (Lichtes Indigo)
-            doc.setFillColor(238, 242, 255); // Ähnlich wie Tailwind Indigo-100
+            doc.setFillColor(219, 234, 254); // Tailwind Blue-200
             doc.rect(0, 0, doc.internal.pageSize.width, 30, 'F');
             
             // Firmenname (Sägewerk Mülleder)
-            doc.setFontSize(24);
-            doc.setTextColor(55, 65, 81); // Dunkelgrau
-            doc.text("Sägewerk Mülleder", margin, 20);
+            doc.setFontSize(28);
+            doc.setFont('Helvetica', 'Bold');
+            doc.setTextColor(30, 64, 175); // Dunkles Blau
+            doc.text("Sägewerk Mülleder", margin, 21);
             
             y = 40; // Startpunkt nach dem Header
 
             // --- 2. DOKUMENTINFORMATIONEN ---
             
-            doc.setFontSize(18);
-            doc.setTextColor(29, 78, 216); // Tailwind Indigo-600
+            doc.setFontSize(20);
+            doc.setFont('Helvetica', 'Bold');
+            doc.setTextColor(17, 24, 39); // Dunkelgrau
             doc.text("Gutschrift", margin, y);
-            y += 8;
+            y += 10;
 
-            doc.setFontSize(10);
-            doc.setTextColor(107, 114, 128); // Standardgrau
+            doc.setFontSize(12);
+            doc.setFont('Helvetica', 'Normal');
+            doc.setTextColor(75, 85, 99); // Standardgrau
             doc.text(`Datum: ${today}`, doc.internal.pageSize.width - margin, y, { align: 'right' });
             
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0); // Schwarz
-            doc.text(`Für Kunde: ${mainCustomer}`, margin, y);
+            doc.setFontSize(14);
+            doc.setFont('Helvetica', 'Bold');
+            doc.setTextColor(31, 41, 55); // Mittleres Grau
+            doc.text(`Kunde: ${mainCustomer}`, margin, y);
             y += 12; 
 
             // Trennlinie
-            doc.setDrawColor(209, 213, 219); // Hellgrau
-            doc.setLineWidth(0.5);
+            doc.setDrawColor(30, 64, 175); // Dunkles Blau
+            doc.setLineWidth(1);
             doc.line(margin, y, doc.internal.pageSize.width - margin, y);
-            y += 8;
+            y += 10;
             
             // --- 3. VOLUMEN-ZUSAMMENFASSUNG ---
             
-            doc.setFontSize(14);
-            doc.setTextColor(55, 65, 81); // Dunkelgrau
+            doc.setFontSize(16);
+            doc.setFont('Helvetica', 'Bold');
+            doc.setTextColor(31, 41, 55);
             doc.text("1. Gesamtvolumen nach Klassifizierung", margin, y);
             y += 5;
 
@@ -578,10 +559,10 @@
                 head: [['Klassifizierung', 'Volumen']],
                 body: summaryTableData,
                 foot: [['Gesamtvolumen', totalVolume.toFixed(3) + ' fm']],
-                theme: 'grid', // Moderner, einfacher Look
-                styles: { fontSize: 10, cellPadding: 3 },
-                headStyles: { fillColor: [156, 163, 175], textColor: [255, 255, 255], fontStyle: 'bold' }, // Tailwind Gray-400
-                footStyles: { fillColor: [209, 213, 219], fontStyle: 'bold', textColor: [0, 0, 0] }, // Tailwind Gray-300
+                theme: 'grid', 
+                styles: { fontSize: 11, cellPadding: 3, textColor: [55, 65, 81] },
+                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' }, // Tailwind Indigo-600
+                footStyles: { fillColor: [224, 231, 255], fontStyle: 'bold', textColor: [0, 0, 0] }, // Tailwind Indigo-200
                 columnStyles: { 1: { halign: 'right' } } // Volumen rechtsbündig
             });
 
@@ -589,8 +570,9 @@
 
             // --- 4. DETAILLIERTE STAMMLISTE ---
             
-            doc.setFontSize(14);
-            doc.setTextColor(55, 65, 81);
+            doc.setFontSize(16);
+            doc.setFont('Helvetica', 'Bold');
+            doc.setTextColor(31, 41, 55);
             doc.text("2. Detaillierte Stammliste", margin, y);
             y += 5;
             
@@ -620,8 +602,8 @@
                 head: [detailTableHead],
                 body: detailTableBody,
                 theme: 'striped', // Streifen für bessere Lesbarkeit
-                styles: { fontSize: 8, cellPadding: 2 },
-                headStyles: { fillColor: [55, 65, 81], textColor: [255, 255, 255] }, // Dunkelgrau wie im Footer
+                styles: { fontSize: 9, cellPadding: 2, textColor: [55, 65, 81] },
+                headStyles: { fillColor: [55, 65, 81], textColor: [255, 255, 255], fontStyle: 'bold' }, // Dunkelgrau 
                 columnStyles: { 
                     3: { halign: 'right' }, // Länge
                     4: { halign: 'right' }, // Durchmesser
@@ -630,6 +612,7 @@
                 didDrawPage: (data) => {
                     // Footer für Seitennummerierung
                     doc.setFontSize(8);
+                    doc.setFont('Helvetica', 'Italic');
                     doc.setTextColor(156, 163, 175);
                     doc.text(`Sägewerk Mülleder - Seite ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - margin, doc.internal.pageSize.height - 5, { align: 'right' });
                 }
@@ -658,7 +641,7 @@
                 // Schaltfläche auf Bearbeitungsmodus umstellen
                 saveButton.textContent = 'Änderungen speichern';
                 saveButton.classList.remove('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
-                saveButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
+                saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:ring-blue-500');
 
                 document.getElementById('kunde').focus();
             }
@@ -670,12 +653,9 @@
         function resetFormForNewEntry() {
             document.getElementById('editing-id').value = '';
             
-            // Hier wird nichts zurückgesetzt, da die Formularwerte beim Speichern 
-            // gemäß der Logik direkt manipuliert werden, wenn nicht im Bearbeitungsmodus.
-            
             // Schaltfläche zurücksetzen
-            saveButton.textContent = 'Stamm speichern (oder Enter in Mitteldurchmesser)';
-            saveButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
+            saveButton.textContent = 'Stamm speichern (oder Enter in Ø)';
+            saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'focus:ring-blue-500');
             saveButton.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
         }
 
@@ -715,7 +695,7 @@
                 // Validierung
                 if (isNaN(laenge) || laenge <= 0 || isNaN(durchmesser) || durchmesser <= 0) {
                     feedback.textContent = 'Fehler: Länge/Durchmesser fehlen oder sind ungültig!';
-                    feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                    feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
                     feedback.classList.remove('hidden');
                     setTimeout(() => feedback.classList.add('hidden'), 4000);
                     
@@ -771,7 +751,7 @@
                 renderTable();
 
                 // Feedback anzeigen
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-green-600 font-medium';
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-green-600 font-semibold';
                 feedback.classList.remove('hidden');
                 
                 // Feedback nach 3 Sekunden ausblenden
