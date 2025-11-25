@@ -1,3 +1,45 @@
+// --- Zwingende Sicherheitsprüfung für JEDE Seite ---
+function checkAuth() {
+    // Wenn der "isLoggedIn"-Flag nicht in der Session gesetzt ist...
+    if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+        // ... leite zur Hauptseite weiter, wo der Login-Screen erscheint.
+        window.location.href = 'index.html'; 
+    } else {
+        // Bei erfolgreichem Login den App-Container anzeigen.
+        const appContainer = document.getElementById('app-container');
+        if (appContainer) {
+            appContainer.classList.remove('hidden');
+            appContainer.style.opacity = '1';
+        }
+        // Login-Screen ausblenden (falls auf der Seite vorhanden, z.B. für kosmetische Zwecke)
+        const loginScreen = document.getElementById('login-screen');
+        if (loginScreen) {
+             loginScreen.classList.add('hidden');
+        }
+    }
+}
+
+// Global verfügbare Logout-Funktion
+window.logout = function() {
+    sessionStorage.removeItem('isLoggedIn');
+    window.location.href = 'index.html'; // Leite immer zur Hauptseite weiter
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Führt die Prüfung beim Laden der Seite aus
+    checkAuth();
+
+    // HIER KÖNNEN SIE IHREN WEITEREN SEITENSPEZIFISCHEN JAVASCRIPT-CODE EINFÜGEN
+    // ...
+});
+// --------------------------------------------------
+
+**Zusammenfassung der Sicherheit:**
+
+* **`index.html`:** Enthält Login-Formular, speichert bei Erfolg `isLoggedIn: true` in `sessionStorage`.
+* **Andere Seiten (`archiv.html`, etc.):** Prüfen beim Laden der Seite (`checkAuth()`), ob `isLoggedIn` gesetzt ist. Wenn nicht, erfolgt eine sofortige Weiterleitung zu `index.html`.
+* **Logout-Button:** Entfernt den `isLoggedIn`-Flag und leitet den Benutzer zurück zur Login-Seite.
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
