@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preise & Tarife</title>
+    <title>Preise & Tarife Verwaltung</title>
     <!-- Einbindung von Tailwind CSS für Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -14,111 +14,116 @@
             display: flex;
             flex-direction: column;
         }
+        /* Anpassung für die Tabelle auf kleinen Bildschirmen */
+        .price-table th, .price-table td {
+            white-space: nowrap; /* Verhindert Zeilenumbrüche in den Tabellenzellen */
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
     <!-- Navigationsleiste -->
     <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
-        <div class="container mx-auto flex justify-between items-center">
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
             <!-- Logo oder Markenname -->
-            <a href="index.html" class="text-xl font-bold text-indigo-600">Ihr Unternehmen</a>
+            <!-- Annahme: Firmenname ist "Sägewerk Mülleder" basierend auf dem letzten Index-Dokument -->
+            <a href="index.html" class="text-xl font-bold text-blue-600">Sägewerk Mülleder</a>
             <!-- Navigationslinks -->
             <div class="flex space-x-4">
-                <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Startseite</a>
-                <a href="kunden.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Kunden</a>
-                <a href="preise.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition duration-300 border-b-2 border-indigo-600 pb-1">Preise</a>
+                <a href="index.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Dashboard</a>
+                <a href="archiv.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Archiv</a>
+                <a href="kunden.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Kunden</a>
+                <a href="preise.html" class="text-blue-600 font-semibold hover:text-blue-800 transition duration-300 border-b-2 border-blue-600 pb-1">Preise</a>
             </div>
         </div>
     </nav>
 
     <!-- Hauptinhalt (Preis-Tabelle) -->
-    <main class="flex-grow container mx-auto p-8">
-        <div class="bg-white p-10 shadow-xl rounded-xl w-full max-w-4xl mx-auto text-center">
-            <h1 class="text-4xl font-bold text-indigo-600 mb-4">Wählen Sie Ihren passenden Tarif</h1>
-            <p class="text-lg text-gray-600 mb-10">
-                Transparente Preise ohne versteckte Kosten. Starten Sie noch heute!
+    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+        <div class="bg-white p-6 sm:p-10 shadow-2xl rounded-xl w-full">
+            <h1 class="text-3xl font-bold text-blue-700 mb-2">Holz-Preisliste & Tarife</h1>
+            <p class="text-lg text-gray-600 mb-8">
+                Verwalten Sie hier alle aktuellen Einkaufspreise pro Festmeter (fm).
             </p>
 
-            <!-- Preiskarten-Grid -->
-            <div class="grid md:grid-cols-3 gap-8">
-                
-                <!-- Tarif 1: Basis -->
-                <div class="flex flex-col bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Basis</h2>
-                    <p class="text-4xl font-extrabold text-indigo-600 mb-4">
-                        <span class="text-xl align-top">€</span>19<span class="text-xl font-medium">/Monat</span>
-                    </p>
-                    <ul class="text-left space-y-3 text-gray-600 flex-grow mb-6">
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Einfache Funktionen
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            5 Projekte inklusive
-                        </li>
-                        <li class="flex items-center text-gray-400">
-                            <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            Kein Premium-Support
-                        </li>
-                    </ul>
-                    <a href="#" class="block w-full text-center px-6 py-3 border border-indigo-600 text-indigo-600 font-medium rounded-lg hover:bg-indigo-100 transition duration-300">
-                        Jetzt starten
-                    </a>
-                </div>
+            <!-- Button zum Umschalten der Formularansicht -->
+            <button id="toggle-form-button" class="px-6 py-2 mb-6 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                Neue Preisposition hinzufügen
+            </button>
 
-                <!-- Tarif 2: Premium (Empfohlen) -->
-                <div class="flex flex-col bg-indigo-600 p-8 rounded-xl shadow-2xl scale-105 transform border-4 border-indigo-300">
-                    <p class="text-xs font-bold text-white uppercase tracking-wider mb-2">Am beliebtesten</p>
-                    <h2 class="text-3xl font-bold text-white mb-4">Premium</h2>
-                    <p class="text-5xl font-extrabold text-white mb-4">
-                        <span class="text-xl align-top">€</span>49<span class="text-xl font-medium">/Monat</span>
-                    </p>
-                    <ul class="text-left space-y-3 text-indigo-100 flex-grow mb-6">
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Alle Basis-Funktionen
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Unbegrenzte Projekte
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            24/7 Premium-Support
-                        </li>
-                    </ul>
-                    <a href="#" class="block w-full text-center px-6 py-3 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition duration-300 shadow-md">
-                        Premium buchen
-                    </a>
-                </div>
+            <!-- Formular zum Hinzufügen/Bearbeiten von Preisen (Anfangs ausgeblendet) -->
+            <div id="price-form-container" class="hidden bg-blue-50 p-6 rounded-lg mb-8 border border-blue-200">
+                <h2 id="form-title" class="text-xl font-semibold text-blue-700 mb-4">Neue Preisposition anlegen</h2>
+                <form id="price-entry-form" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Verstecktes Feld zur Speicherung der ID bei Bearbeitung -->
+                    <input type="hidden" id="editing-id" value="">
+                    
+                    <!-- Felder für die Preisdaten -->
+                    <div class="col-span-1">
+                        <label for="holzart" class="block text-sm font-medium text-gray-700">Holzart</label>
+                        <input type="text" id="holzart" name="holzart" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="qualitaet" class="block text-sm font-medium text-gray-700">Qualität</label>
+                        <input type="text" id="qualitaet" name="qualitaet" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="klasse" class="block text-sm font-medium text-gray-700">Klasse</label>
+                        <input type="text" id="klasse" name="klasse" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="orAb" class="block text-sm font-medium text-gray-700">oR ab (cm)</label>
+                        <input type="text" id="orAb" name="orAb" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="irAb" class="block text-sm font-medium text-gray-700">iR ab (cm)</label>
+                        <input type="text" id="irAb" name="irAb" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="laenge" class="block text-sm font-medium text-gray-700">Länge</label>
+                        <input type="text" id="laenge" name="laenge" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="z.B. '2.5m - 5m' oder leer">
+                    </div>
+                    <div class="col-span-1">
+                        <label for="preis" class="block text-sm font-medium text-gray-700">Preis (€/fm)</label>
+                        <input type="number" step="0.01" id="preis" name="preis" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
+                    </div>
 
-                <!-- Tarif 3: Enterprise -->
-                <div class="flex flex-col bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Enterprise</h2>
-                    <p class="text-4xl font-extrabold text-indigo-600 mb-4">
-                        <span class="text-xl align-top">€</span>Kontakt<span class="text-xl font-medium">/Monat</span>
-                    </p>
-                    <ul class="text-left space-y-3 text-gray-600 flex-grow mb-6">
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Dedizierter Server
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Individuelle Lösungen
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Persönlicher Account Manager
-                        </li>
-                    </ul>
-                    <a href="#" class="block w-full text-center px-6 py-3 border border-indigo-600 text-indigo-600 font-medium rounded-lg hover:bg-indigo-100 transition duration-300">
-                        Angebot anfordern
-                    </a>
-                </div>
+                    <!-- Button für Speichern/Aktualisieren -->
+                    <div class="col-span-2 md:col-span-4 flex space-x-4 mt-4">
+                        <button type="submit" id="submit-button" class="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
+                            Speichern
+                        </button>
+                        <button type="button" onclick="window.resetFormAndHide()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300">
+                            Abbrechen
+                        </button>
+                    </div>
+                </form>
             </div>
+
+
+            <!-- Preisliste Tabelle -->
+            <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200 price-table">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Holzart</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Klasse</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">oR ab</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">iR ab</th>
+                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Länge</th>
+                            <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Preis (€/fm)</th>
+                            <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="price-table-body" class="bg-white divide-y divide-gray-100">
+                        <!-- Preispositionen werden hier dynamisch eingefügt -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Feedback Message -->
+            <div id="feedback-message" class="mt-4 text-center text-sm font-semibold hidden"></div>
 
         </div>
     </main>
@@ -126,13 +131,215 @@
     <!-- Fußzeile -->
     <footer class="bg-gray-800 text-white p-4 mt-auto">
         <div class="container mx-auto text-center text-sm">
-            <p>&copy; <span id="year"></span> Ihr Unternehmen. Alle Rechte vorbehalten.</p>
+            <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
         </div>
     </footer>
 
-    <!-- JavaScript für das aktuelle Jahr in der Fußzeile -->
+    <!-- JavaScript für die Preisverwaltung -->
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Standard-Daten (Ihre Liste)
+        const initialPriceData = [
+            { holzart: "Fichte", qualitaet: "A/B", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 90.00 },
+            { holzart: "Fichte", qualitaet: "A/B", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 110.00 },
+            { holzart: "Fichte", qualitaet: "A/B", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 120.00 },
+            { holzart: "Fichte", qualitaet: "Braunholz", klasse: "1b+", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 90.00 },
+            { holzart: "Fichte", qualitaet: "C-Holz", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 60.00 },
+            { holzart: "Fichte", qualitaet: "C-Holz", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 80.00 },
+            { holzart: "Fichte", qualitaet: "C-Holz", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 90.00 },
+            { holzart: "Kiefer", qualitaet: "A/B", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 60.00 },
+            { holzart: "Kiefer", qualitaet: "A/B", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 80.00 },
+            { holzart: "Kiefer", qualitaet: "A/B", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 90.00 },
+            // Fehlende Preise auf 0.00 setzen, damit sie bearbeitet werden können
+            { holzart: "Kiefer", qualitaet: "C-Holz", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 0.00 },
+            { holzart: "Kiefer", qualitaet: "C-Holz", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 0.00 },
+            { holzart: "Kiefer", qualitaet: "C-Holz", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 0.00 },
+        ];
+
+        // Funktion zum Laden der Daten
+        function loadPrices() {
+            let prices = localStorage.getItem('woodPrices');
+            if (prices) {
+                return JSON.parse(prices);
+            }
+            // Wenn keine Daten vorhanden, Initialdaten mit IDs befüllen
+            return initialPriceData.map((item, index) => ({ ...item, id: Date.now() + index }));
+        }
+
+        let priceList = loadPrices();
+
+        // Funktion zum Speichern der Daten
+        function savePrices() {
+            localStorage.setItem('woodPrices', JSON.stringify(priceList));
+        }
+
+        // --- UI Hilfsfunktionen ---
+
+        function showFeedback(message, isError = false) {
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = message;
+            feedback.className = `mt-4 text-center text-sm font-semibold ${isError ? 'text-red-600' : 'text-green-600'}`;
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+
+        window.showForm = function(isEditing = false) {
+            const container = document.getElementById('price-form-container');
+            const title = document.getElementById('form-title');
+            const button = document.getElementById('submit-button');
+            
+            container.classList.remove('hidden');
+            document.getElementById('toggle-form-button').classList.add('hidden');
+            
+            if (isEditing) {
+                title.textContent = "Preisposition bearbeiten";
+                button.textContent = "Änderungen speichern";
+                button.classList.replace('bg-green-600', 'bg-blue-600');
+            } else {
+                title.textContent = "Neue Preisposition anlegen";
+                button.textContent = "Speichern";
+                button.classList.replace('bg-blue-600', 'bg-green-600');
+            }
+        }
+
+        window.hideForm = function() {
+            document.getElementById('price-form-container').classList.add('hidden');
+            document.getElementById('toggle-form-button').classList.remove('hidden');
+        }
+        
+        window.resetFormAndHide = function() {
+            document.getElementById('price-entry-form').reset();
+            document.getElementById('editing-id').value = '';
+            window.hideForm();
+        }
+
+        // --- CRUD Operationen ---
+
+        // Funktion zum Rendern der Tabelle
+        function renderPriceTable() {
+            const tbody = document.getElementById('price-table-body');
+            tbody.innerHTML = '';
+
+            if (priceList.length === 0) {
+                 const row = tbody.insertRow();
+                 row.innerHTML = `<td colspan="8" class="px-3 py-4 text-center text-sm text-gray-500 italic bg-white">Keine Preispositionen angelegt.</td>`;
+                 return;
+            }
+
+            priceList.forEach(entry => {
+                const row = tbody.insertRow();
+                row.className = 'hover:bg-blue-50 transition duration-100';
+
+                // Datenzellen
+                row.insertCell().textContent = entry.holzart;
+                row.insertCell().textContent = entry.qualitaet;
+                row.insertCell().textContent = entry.klasse;
+                row.insertCell().textContent = entry.orAb;
+                row.insertCell().textContent = entry.irAb;
+                row.insertCell().textContent = entry.laenge;
+
+                // Preis (rechtsbündig)
+                const preisCell = row.insertCell();
+                preisCell.textContent = parseFloat(entry.preis).toFixed(2).replace('.', ',') + ' €';
+                preisCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-bold text-green-700 text-right';
+
+                // Aktionen
+                const actionsCell = row.insertCell();
+                actionsCell.className = 'px-3 py-2 whitespace-nowrap text-right';
+                actionsCell.innerHTML = `
+                    <button onclick="window.editPrice(${entry.id})" class="text-blue-600 hover:text-blue-900 text-sm font-medium mr-2 transition duration-150">Bearbeiten</button>
+                    <button onclick="window.deletePrice(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium transition duration-150">Löschen</button>
+                `;
+            });
+        }
+
+        // Bearbeitungsfunktion
+        window.editPrice = function(id) {
+            const entryToEdit = priceList.find(e => e.id === id);
+            if (entryToEdit) {
+                // Formularfelder füllen
+                document.getElementById('holzart').value = entryToEdit.holzart;
+                document.getElementById('qualitaet').value = entryToEdit.qualitaet;
+                document.getElementById('klasse').value = entryToEdit.klasse;
+                document.getElementById('orAb').value = entryToEdit.orAb;
+                document.getElementById('irAb').value = entryToEdit.irAb;
+                document.getElementById('laenge').value = entryToEdit.laenge;
+                document.getElementById('preis').value = entryToEdit.preis;
+
+                document.getElementById('editing-id').value = id;
+                window.showForm(true); // Formular im Bearbeitungsmodus anzeigen
+                document.getElementById('holzart').focus();
+            }
+        }
+
+        // Löschfunktion
+        window.deletePrice = function(id) {
+            const originalLength = priceList.length;
+            priceList = priceList.filter(e => e.id !== id);
+            
+            if (priceList.length < originalLength) {
+                savePrices();
+                renderPriceTable();
+                showFeedback('Preisposition erfolgreich gelöscht.');
+            } else {
+                showFeedback('Fehler beim Löschen der Preisposition.', true);
+            }
+        }
+
+        // Formular-Submit-Handler (Hinzufügen und Speichern)
+        document.getElementById('price-entry-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const isEditing = !!document.getElementById('editing-id').value;
+
+            const newEntry = {
+                holzart: form.holzart.value,
+                qualitaet: form.qualitaet.value,
+                klasse: form.klasse.value,
+                orAb: form.orAb.value,
+                irAb: form.irAb.value,
+                laenge: form.laenge.value,
+                preis: parseFloat(form.preis.value)
+            };
+
+            if (isNaN(newEntry.preis)) {
+                showFeedback('Fehler: Preis muss eine gültige Zahl sein.', true);
+                return;
+            }
+
+            if (isEditing) {
+                // Aktualisieren
+                const id = parseInt(document.getElementById('editing-id').value);
+                const index = priceList.findIndex(e => e.id === id);
+                
+                if (index !== -1) {
+                    priceList[index] = { ...newEntry, id: id };
+                    showFeedback('Preisposition erfolgreich aktualisiert!');
+                }
+            } else {
+                // Hinzufügen
+                newEntry.id = Date.now();
+                priceList.push(newEntry);
+                showFeedback('Neue Preisposition erfolgreich hinzugefügt!');
+            }
+
+            savePrices();
+            renderPriceTable();
+            window.resetFormAndHide();
+        });
+        
+        // Button zum Formular anzeigen
+        document.getElementById('toggle-form-button').addEventListener('click', () => {
+             window.resetFormAndHide(); // Erst resetten, um sicherzustellen, dass es ein neuer Eintrag ist
+             window.showForm(false);
+             document.getElementById('holzart').focus();
+        });
+
+
+        // Initialer Aufruf
+        document.addEventListener('DOMContentLoaded', renderPriceTable);
     </script>
 </body>
 </html>
