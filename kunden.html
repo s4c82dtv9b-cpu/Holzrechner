@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unsere Kunden</title>
+    <title>Kundenverwaltung</title>
     <!-- Einbindung von Tailwind CSS für Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Setzt die Standard-Schriftart auf Inter und sorgt für eine fließende Höhe */
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+        }
+        .table-container {
+            max-height: 60vh;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -20,60 +23,237 @@
 
     <!-- Navigationsleiste -->
     <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
-        <div class="container mx-auto flex justify-between items-center">
-            <!-- Logo oder Markenname -->
-            <a href="index.html" class="text-xl font-bold text-indigo-600">Ihr Unternehmen</a>
-            <!-- Navigationslinks -->
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
+            <a href="index.html" class="text-xl font-bold text-blue-600">Sägewerk Mülleder</a>
             <div class="flex space-x-4">
-                <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Startseite</a>
-                <a href="kunden.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition duration-300 border-b-2 border-indigo-600 pb-1">Kunden</a>
-                <a href="preise.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Preise</a>
+                <a href="index.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Dashboard</a>
+                <a href="archiv.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Archiv</a>
+                <a href="kunden.html" class="text-blue-600 font-semibold hover:text-blue-800 transition duration-300 border-b-2 border-blue-600 pb-1">Kunden</a>
+                <a href="preise.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Preise</a>
+                <a href="preisdokument.html" target="_blank" class="text-gray-600 hover:text-blue-600 transition duration-300" title="Öffnet die vollständige Preisliste in Druckansicht">Gesamt-Preise (PDF)</a>
             </div>
         </div>
     </nav>
 
     <!-- Hauptinhalt -->
-    <main class="flex-grow container mx-auto p-8">
-        <div class="bg-white p-10 shadow-xl rounded-xl w-full max-w-4xl mx-auto">
-            <h1 class="text-4xl font-bold text-indigo-600 mb-6 border-b pb-2">Unsere zufriedenen Kunden</h1>
+    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2">Kundenstamm verwalten</h1>
 
-            <p class="text-lg text-gray-600 mb-8">
-                Wir sind stolz darauf, eine vielfältige Palette von Kunden in verschiedenen Branchen zu unterstützen. Hier sind einige Beispiele unserer Arbeit und Partnerschaften.
-            </p>
+        <!-- Kunden-Anlageformular -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Neuen Kunden anlegen</h2>
+            <form id="customer-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
 
-            <!-- Kunden- oder Testimonial-Karten -->
-            <div class="grid md:grid-cols-2 gap-6">
-                <!-- Kunden-Card 1 -->
-                <div class="bg-indigo-50 p-6 rounded-lg shadow-md">
-                    <p class="text-sm font-semibold text-indigo-700 mb-2">Technologie-Startup</p>
-                    <blockquote class="italic text-gray-700">
-                        "Die Lösung von [Ihr Unternehmen] hat unsere Markteinführungszeit um 30% verkürzt. Exzellenter Support und innovative Technologie!"
-                    </blockquote>
-                    <p class="mt-4 text-right font-medium text-gray-800">— Max Mustermann, CEO TechVision</p>
+                <!-- 1. Name -->
+                <div class="md:col-span-2">
+                    <label for="vorname" class="block text-sm font-medium text-gray-700">Vorname <span class="text-red-500">*</span></label>
+                    <input type="text" id="vorname" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="nachname" class="block text-sm font-medium text-gray-700">Nachname <span class="text-red-500">*</span></label>
+                    <input type="text" id="nachname" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                 </div>
 
-                <!-- Kunden-Card 2 -->
-                <div class="bg-indigo-50 p-6 rounded-lg shadow-md">
-                    <p class="text-sm font-semibold text-indigo-700 mb-2">Lokales Handwerk</p>
-                    <blockquote class="italic text-gray-700">
-                        "Seit der Implementierung der neuen Systeme läuft unser Bestellprozess reibungsloser denn je. Sehr empfehlenswert für kleine und mittlere Unternehmen."
-                    </blockquote>
-                    <p class="mt-4 text-right font-medium text-gray-800">— Erika Musterfrau, Inhaberin HandwerkPlus</p>
+                <!-- 2. Adresse -->
+                <div class="md:col-span-2">
+                    <label for="adresse" class="block text-sm font-medium text-gray-700">Straße <span class="text-red-500">*</span></label>
+                    <input type="text" id="adresse" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                 </div>
-            </div>
+                <div class="md:col-span-1">
+                    <label for="hausnummer" class="block text-sm font-medium text-gray-700">Hausnummer <span class="text-red-500">*</span></label>
+                    <input type="text" id="hausnummer" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div class="md:col-span-1">
+                    <label for="plz" class="block text-sm font-medium text-gray-700">PLZ <span class="text-red-500">*</span></label>
+                    <input type="text" id="plz" required pattern="[0-9]{4,5}" title="4-5 Zahlen" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                
+                <!-- 3. Ort & Optional -->
+                <div class="md:col-span-4">
+                    <label for="ort" class="block text-sm font-medium text-gray-700">Ort <span class="text-red-500">*</span></label>
+                    <input type="text" id="ort" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                
+                <!-- 4. Optional -->
+                <div class="md:col-span-2">
+                    <label for="handy" class="block text-sm font-medium text-gray-700">Handynummer (optional)</label>
+                    <input type="tel" id="handy" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="email" class="block text-sm font-medium text-gray-700">E-Mail (optional)</label>
+                    <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+
+                <div class="md:col-span-4 mt-4">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
+                        Kunden speichern
+                    </button>
+                    <p id="feedback" class="text-center mt-2 hidden text-sm font-medium"></p>
+                </div>
+            </form>
         </div>
+
+        <!-- Kundenliste Tabelle -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Liste der gespeicherten Kunden</h2>
+            
+            <div class="table-container">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adresse</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Kontaktdaten</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-list-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Kunden werden hier dynamisch eingefügt -->
+                    </tbody>
+                </table>
+            </div>
+             <p id="no-customers-message" class="text-center text-gray-500 mt-4 text-sm hidden">Noch keine Kunden angelegt.</p>
+        </div>
+
     </main>
 
     <!-- Fußzeile -->
     <footer class="bg-gray-800 text-white p-4 mt-auto">
         <div class="container mx-auto text-center text-sm">
-            <p>&copy; <span id="year"></span> Ihr Unternehmen. Alle Rechte vorbehalten.</p>
+            <p>&copy; <span id="year-footer"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
         </div>
     </footer>
 
-    <!-- JavaScript für das aktuelle Jahr in der Fußzeile -->
     <script>
-        document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById('year-footer').textContent = new Date().getFullYear();
+
+        // Funktion zum Generieren einer einfachen ID
+        function generateId() {
+            return 'cust-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Kunden aus localStorage laden
+        function loadCustomers() {
+            const customers = localStorage.getItem('customerList');
+            return customers ? JSON.parse(customers) : [];
+        }
+
+        // Kunden in localStorage speichern
+        function saveCustomers(customers) {
+            localStorage.setItem('customerList', JSON.stringify(customers));
+        }
+
+        // Tabelle rendern
+        function renderCustomers() {
+            const customers = loadCustomers();
+            const tableBody = document.getElementById('customer-list-body');
+            const noCustomersMessage = document.getElementById('no-customers-message');
+            tableBody.innerHTML = ''; 
+
+            if (customers.length === 0) {
+                noCustomersMessage.classList.remove('hidden');
+                return;
+            } else {
+                noCustomersMessage.classList.add('hidden');
+            }
+
+            customers.forEach(customer => {
+                const row = tableBody.insertRow();
+                row.className = 'hover:bg-gray-50';
+
+                // Name Zelle
+                const nameCell = row.insertCell();
+                nameCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900';
+                nameCell.innerHTML = `
+                    <span class="font-bold">${customer.nachname}</span>, ${customer.vorname}
+                    <span class="block text-xs text-gray-500 sm:hidden">${customer.ort}</span>
+                `;
+
+                // Adresse Zelle
+                const addressCell = row.insertCell();
+                addressCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500';
+                addressCell.textContent = `${customer.adresse} ${customer.hausnummer}, ${customer.plz} ${customer.ort}`;
+
+                // Kontaktdaten Zelle (Versteckt auf Mobil)
+                const contactCell = row.insertCell();
+                contactCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell';
+                contactCell.innerHTML = `
+                    ${customer.handy ? `<span class="block">${customer.handy}</span>` : ''}
+                    ${customer.email ? `<span class="block">${customer.email}</span>` : ''}
+                    ${!customer.handy && !customer.email ? 'N/A' : ''}
+                `;
+
+                // Aktion Zelle (Löschen)
+                const actionCell = row.insertCell();
+                actionCell.className = 'px-6 py-4 whitespace-nowrap text-right text-sm font-medium';
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Löschen';
+                deleteButton.className = 'text-red-600 hover:text-red-900 transition duration-300';
+                deleteButton.onclick = () => deleteCustomer(customer.id, customer.nachname);
+                actionCell.appendChild(deleteButton);
+            });
+        }
+
+        // Kunden löschen
+        function deleteCustomer(id, nachname) {
+             // Da window.confirm() nicht erlaubt ist, simulieren wir die Bestätigung
+            const confirmed = true; // In diesem Canvas-Umfeld gehen wir von Bestätigung aus.
+            if (!confirmed) return; 
+
+            let customers = loadCustomers();
+            customers = customers.filter(c => c.id !== id);
+            saveCustomers(customers);
+            renderCustomers();
+            
+            showFeedback(`Kunde '${nachname}' wurde gelöscht.`, false, 'text-green-600');
+        }
+
+        // Feedback-Nachricht anzeigen
+        function showFeedback(message, isError, colorClass = 'text-blue-600') {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `text-center mt-2 text-sm font-medium ${colorClass}`;
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+
+        // Formular-Handler
+        document.getElementById('customer-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const newCustomer = {
+                id: generateId(),
+                vorname: document.getElementById('vorname').value.trim(),
+                nachname: document.getElementById('nachname').value.trim(),
+                adresse: document.getElementById('adresse').value.trim(),
+                hausnummer: document.getElementById('hausnummer').value.trim(),
+                plz: document.getElementById('plz').value.trim(),
+                ort: document.getElementById('ort').value.trim(),
+                handy: document.getElementById('handy').value.trim(),
+                email: document.getElementById('email').value.trim(),
+            };
+
+            // Gültigkeitsprüfung der Pflichtfelder (obwohl required im HTML ist, besser JS-Prüfung)
+            if (!newCustomer.vorname || !newCustomer.nachname || !newCustomer.adresse || !newCustomer.hausnummer || !newCustomer.plz || !newCustomer.ort) {
+                 showFeedback('Bitte füllen Sie alle Pflichtfelder (*) aus.', true, 'text-red-600');
+                return;
+            }
+
+            let customers = loadCustomers();
+            customers.push(newCustomer);
+            saveCustomers(customers);
+            
+            // Formular zurücksetzen
+            e.target.reset();
+            
+            // Tabelle neu rendern
+            renderCustomers();
+            
+            showFeedback(`Kunde ${newCustomer.nachname}, ${newCustomer.vorname} erfolgreich gespeichert!`);
+        });
+
+        // Initialisierung
+        document.addEventListener('DOMContentLoaded', renderCustomers);
     </script>
 </body>
 </html>
