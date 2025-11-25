@@ -128,7 +128,7 @@
         function checkAuth() {
             // Wenn der "isLoggedIn"-Flag nicht in der Session gesetzt ist...
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-                // ... leite zur Hauptseite weiter, wo der Login-Screen erscheint.
+                // ... leite zur Hauptseite weiter, wo der Login-Screen erscheint. (Verwendung des relativen Pfades zur Behebung von URL-Fehlern)
                 window.location.href = 'index.html'; 
             } else {
                 // Bei erfolgreichem Login den App-Container anzeigen.
@@ -148,7 +148,7 @@
         // Global verfügbare Logout-Funktion
         window.logout = function() {
             sessionStorage.removeItem('isLoggedIn');
-            window.location.href = 'index.html'; // Leite immer zur Hauptseite weiter
+            window.location.href = 'index.html'; // Leite immer zur Hauptseite weiter (Verwendung des relativen Pfades zur Behebung von URL-Fehlern)
         }
         // --------------------------------------------------
 
