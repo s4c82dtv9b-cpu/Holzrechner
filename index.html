@@ -36,9 +36,10 @@
         <div class="container mx-auto flex justify-between items-center">
             <!-- Logo oder Markenname -->
             <a href="index.html" class="text-xl font-bold text-indigo-600">Ihr Unternehmen</a>
-            <!-- Navigationslinks -->
+            <!-- Navigationslinks mit ARCHIV -->
             <div class="flex space-x-4">
                 <a href="index.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition duration-300 border-b-2 border-indigo-600 pb-1">Dashboard</a>
+                <a href="archiv.html" class="text-gray-600 hover:text-indigo-600 font-semibold transition duration-300">Archiv</a>
                 <a href="kunden.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Kunden</a>
                 <a href="preise.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Preise</a>
             </div>
@@ -234,7 +235,6 @@
         document.getElementById('year').textContent = new Date().getFullYear();
 
         // Array zur Speicherung der Holzstämme (dient als temporäre Datenbank)
-        // Beim Laden wird versucht, Daten aus localStorage zu laden.
         let woodEntries = JSON.parse(localStorage.getItem('woodEntries')) || [];
         const saveButton = document.getElementById('save-button');
         
@@ -249,22 +249,15 @@
         }
 
         // Funktion zur Volumenberechnung (Huber-Formel / Zylindervolumen)
-        // D_mitte in cm, Länge in m. Ergebnis in Kubikmetern (Festmeter).
         function calculateVolume(length, diameter) {
-            // Umrechnung des Durchmessers von cm in Meter (diameter / 100)
             const diameterMeters = diameter / 100;
-            // Fläche des Mitteldurchmessers: (Pi / 4) * D^2
             const basalArea = Math.PI / 4 * diameterMeters * diameterMeters;
-            // Volumen = Fläche * Länge
             const volume = basalArea * length;
             return volume; 
         }
 
         /**
          * Klassifiziert das Holz basierend auf dem Mitteldurchmesser in cm.
-         * Regeln: 1b= 15-19cm, 2a= 20-24cm, 2b+=25cm aufwärts
-         * @param {number} diameter - Mitteldurchmesser in cm.
-         * @returns {string} Die entsprechende Klassifizierung.
          */
         function getClassification(diameter) {
             if (diameter >= 25) {
@@ -341,11 +334,6 @@
 
         /**
          * Zeigt das Bestätigungs-Modal an.
-         * @param {string} title - Titel des Modals.
-         * @param {string} message - Nachricht im Modal.
-         * @param {function} onConfirmAction - Funktion, die bei Bestätigung ausgeführt wird.
-         * @param {any} param - Optionaler Parameter für die Bestätigungsfunktion.
-         * @param {string} confirmText - Text für den Bestätigungsbutton.
          */
         window.showConfirmation = function(title, message, onConfirmAction, param = null, confirmText = 'Bestätigen') {
             document.getElementById('modal-title').textContent = title;
@@ -358,7 +346,6 @@
         
         /**
          * Versteckt das Bestätigungs-Modal und führt die Aktion aus (falls bestätigt).
-         * @param {boolean} confirmed - Wurde die Aktion bestätigt?
          */
         window.hideConfirmation = function(confirmed) {
             document.getElementById('confirmation-modal').classList.add('hidden');
@@ -384,7 +371,6 @@
 
         /**
          * Löscht einen Eintrag anhand seiner ID und speichert die Liste.
-         * @param {number} id - Eindeutige ID des zu löschenden Eintrags.
          */
         window.deleteEntry = function(id) {
             woodEntries = woodEntries.filter(e => e.id !== id);
@@ -400,7 +386,7 @@
         }
 
 
-        // --- ARCHIVIERUNGS-Logik mit Modal ---
+        // --- ARCHIVIERUNGS-Logik mit Modal (NEUE LOGIK) ---
 
         window.confirmArchive = function() {
             if (woodEntries.length === 0) {
@@ -413,7 +399,7 @@
             }
             window.showConfirmation(
                 'Alle Stämme archivieren', 
-                `Wollen Sie wirklich alle ${woodEntries.length} erfassten Stämme archivieren und die Liste leeren?`, 
+                `Wollen Sie wirklich alle ${woodEntries.length} erfassten Stämme archivieren und die Liste leeren? Die Daten sind danach im Archiv einsehbar.`, 
                 window.handleArchive, 
                 null,
                 'Ja, archivieren'
@@ -421,19 +407,41 @@
         }
         
         /**
-         * Archiviert die Liste (löscht alle Einträge).
+         * Archiviert die aktuelle Liste, speichert sie mit einem Zeitstempel und leert die aktuelle Liste.
          */
         window.handleArchive = function() {
+            const currentEntries = woodEntries;
+            
+            // Lade das Archiv (oder leeres Array)
+            const archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
+            
+            // Erstelle Zeitstempel und berechne Gesamtvolumen
+            const timestamp = new Date().toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
+            const totalVolume = currentEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
+
+            const archiveSession = {
+                id: Date.now(), // Eindeutige ID für die Archiv-Sitzung
+                timestamp: timestamp,
+                totalVolume: totalVolume.toFixed(3),
+                count: currentEntries.length,
+                entries: currentEntries // Speichere die tatsächlichen Daten
+            };
+            
+            // Füge die neue Sitzung vorne hinzu
+            archivedEntries.unshift(archiveSession); 
+            localStorage.setItem('archivedEntries', JSON.stringify(archivedEntries));
+
+            // Leere die aktuelle Liste und speichere
             woodEntries = [];
             saveEntries();
             renderTable();
             
             // Archivierungs-Erfolgsmeldung anzeigen
             const feedback = document.getElementById('feedback-message');
-            feedback.textContent = 'Liste erfolgreich archiviert und geleert!';
+            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalVolume} fm) und geleert!`;
             feedback.className = 'col-span-2 md:col-span-5 text-sm text-blue-600 font-medium';
             feedback.classList.remove('hidden');
-            setTimeout(() => feedback.classList.add('hidden'), 3000);
+            setTimeout(() => feedback.classList.add('hidden'), 5000);
         }
         
         // --- LISTE LEEREN Logik mit Modal ---
@@ -449,10 +457,10 @@
             }
             window.showConfirmation(
                 'Liste leeren', 
-                'Sind Sie sicher, dass Sie alle Stämme OHNE Archivierung löschen möchten?', 
+                'Sind Sie sicher, dass Sie alle Stämme OHNE Archivierung löschen möchten? Diese Daten gehen dann verloren!', 
                 window.handleClear, 
                 null,
-                'Ja, löschen'
+                'Ja, endgültig löschen'
             );
         }
 
@@ -484,7 +492,7 @@
                 feedback.textContent = 'Keine Einträge vorhanden, um eine Gutschrift zu erstellen.';
                 feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
                 feedback.classList.remove('hidden');
-                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                setTimeout(() => feedback.classList.add('hidden'), 4000);
                 return;
             }
 
@@ -602,7 +610,6 @@
 
         /**
          * Lädt die Daten eines Eintrags in das Formular zum Bearbeiten.
-         * @param {number} id - Eindeutige ID des zu bearbeitenden Eintrags.
          */
         window.editEntry = function(id) {
             const entryToEdit = woodEntries.find(e => e.id === id);
@@ -675,9 +682,8 @@
                 const durchmesser = parseFloat(durchmesserInput.value);
                 const isEditing = !!editingIdInput.value;
 
-                // Validierung: Prüfen, ob Länge und Durchmesser gültige Zahlen sind
+                // Validierung
                 if (isNaN(laenge) || laenge <= 0 || isNaN(durchmesser) || durchmesser <= 0) {
-                    console.error("Fehler: Länge und Mitteldurchmesser müssen gültige Zahlen größer als 0 sein.");
                     feedback.textContent = 'Fehler: Länge/Durchmesser fehlen oder sind ungültig!';
                     feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
                     feedback.classList.remove('hidden');
@@ -703,7 +709,7 @@
                 };
 
                 if (isEditing) {
-                    // Bearbeiten: Bestehenden Eintrag aktualisieren
+                    // Bearbeiten
                     const id = parseInt(editingIdInput.value);
                     const index = woodEntries.findIndex(e => e.id === id);
                     
@@ -713,7 +719,7 @@
                     }
                     resetFormForNewEntry(); 
                 } else {
-                    // Neuer Eintrag: Hinzufügen mit neuer ID
+                    // Neuer Eintrag
                     newEntry.id = Date.now(); 
                     woodEntries.push(newEntry);
                     feedback.textContent = 'Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!';
@@ -736,10 +742,10 @@
                 laengeInput.select();
             });
             
-            // Initialer Aufruf, um die Tabelle beim Laden mit gespeicherten Daten zu befüllen
+            // Initialer Aufruf
             renderTable();
             
-            // Setzt den anfänglichen Fokus auf das Kunden-Feld für einen schnellen Start
+            // Setzt den anfänglichen Fokus
             document.getElementById('kunde').focus();
         });
     </script>
