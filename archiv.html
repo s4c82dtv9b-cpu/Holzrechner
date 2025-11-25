@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holzrechner Archiv (Geschützt)</title>
+    <title>Holzrechner Archiv Übersicht</title>
+    <!-- Einbindung von Tailwind CSS für Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -12,131 +14,68 @@
             display: flex;
             flex-direction: column;
         }
-        /* Erhöhte Z-Index für Modals, damit sie über dem Hauptinhalt und der Navigationsleiste liegen */
-        .modal-overlay {
-            z-index: 50; 
-        }
-
-        /* Spezieller Stil für den PDF-Export (wird nur beim Drucken aktiv) */
-        @media print {
-            body > *:not(#print-content) {
-                display: none !important; /* Versteckt alles außer dem Druckinhalt */
-            }
-            #print-content {
-                display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-                background: white;
-            }
-            #print-content .page-break {
-                page-break-after: always; /* Für klare Seitenumbrüche */
-            }
+        .table-font {
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- SICHERHEIT: ANMELDEBILDSCHIRM (Muss auf jeder geschützten Seite vorhanden sein) -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gray-50 fixed inset-0 z-50 opacity-0">
-        <div class="w-full max-w-md bg-white p-8 shadow-2xl rounded-xl border border-gray-100 transition-opacity duration-500 ease-in-out">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Zugriff erforderlich</h1>
-            <p id="error-message" class="text-red-600 font-medium mb-4 text-center hidden">Falscher Benutzername oder falsches Passwort.</p>
-            
-            <form id="login-form">
-                <div class="mb-4">
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Benutzername (admin)</label>
-                    <input type="text" id="username" name="username" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
-                           placeholder="Benutzername eingeben">
-                </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Passwort (admin)</label>
-                    <input type="password" id="password" name="password" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
-                           placeholder="Passwort eingeben">
-                </div>
-                <button type="submit" 
-                        class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
-                    Anmelden
-                </button>
-            </form>
+    <!-- Navigationsleiste -->
+    <nav class="bg-white shadow-xl p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
+            <!-- Logo oder Markenname -->
+            <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
+            <!-- Navigationslinks mit ARCHIV -->
+            <div class="flex space-x-6">
+                <a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Dashboard</a>
+                <a href="archiv.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Archiv</a>
+                <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
+                <a href="preise.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Preise</a>
+            </div>
         </div>
-    </div>
-    <!-- ENDE: SICHERHEIT: ANMELDEBILDSCHIRM -->
+    </nav>
 
-
-    <!-- Hauptinhalts-Container (Startet versteckt, wird durch JS sichtbar) -->
-    <div id="app-container" class="hidden opacity-0 min-h-screen flex flex-col w-full transition-opacity duration-500 ease-in-out">
-
-        <!-- Navigationsleiste -->
-        <nav class="bg-white shadow-xl p-4 sticky top-0 z-10">
-            <div class="container mx-auto flex justify-between items-center max-w-7xl">
-                <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
-                <div class="flex space-x-6 items-center">
-                    <a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Dashboard</a>
-                    <a href="archiv.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Archiv</a>
-                    <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
-                    <a href="preise.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Preise</a>
-                    <!-- Logout Button -->
-                    <button onclick="window.logout()" class="text-red-600 hover:text-red-800 font-medium transition duration-300 ml-4 py-1 px-3 border border-red-200 rounded-lg">
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Hauptinhalt (Archiv Ansicht) -->
-        <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
-            <h1 class="text-4xl font-extrabold text-blue-700 mb-8 text-center sm:text-left">
-                Archivierte Gutschriften (Zusammenfassung)
+    <!-- Hauptinhalt (Archiv Ansicht) -->
+    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+        <div class="w-full mx-auto">
+            <!-- HAUPTTITEL FÜR DIE SEITE -->
+            <h1 class="text-4xl font-extrabold text-green-700 mb-2 text-center sm:text-left">
+                Gutschrifts-Archiv
             </h1>
+            <p class="text-gray-600 mb-8 text-center sm:text-left">
+                Hier finden Sie alle archivierten Gutschrifts-Sitzungen.
+            </p>
 
-            <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-12 border-t-6 border-blue-600">
-                <h2 class="text-3xl font-bold text-gray-700 mb-6">Alle Archiv-Sitzungen</h2>
-                
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kunde / Empfänger</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Archiviert am</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Gesamtvolumen (fm)</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Gesamtpreis Brutto (€)</th>
-                                <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Details</th>
-                            </tr>
-                        </thead>
-                        <tbody id="archive-list" class="bg-white divide-y divide-gray-200">
-                            <!-- Archivierte Sitzungen (Kurzinfos) werden hier dynamisch eingefügt -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <p id="no-archive-message" class="text-gray-500 italic text-center py-10 hidden">
-                    Es wurden noch keine Gutschriften archiviert. Bitte erstellen und speichern Sie neue Protokolle über das <a href="index.html" class="text-blue-600 font-semibold underline hover:text-blue-800">Dashboard</a>.
-                </p>
-
-                <div class="mt-8 flex justify-end">
-                    <!-- Button zum Löschen des gesamten Archivs (mit Bestätigung) -->
-                    <button id="clear-archive-button" onclick="window.confirmClearArchive()" class="px-6 py-2.5 text-sm font-medium text-red-600 bg-red-100 rounded-xl hover:bg-red-200 transition duration-300 border border-red-200">
-                        Gesamtes Archiv löschen (Verlust!)
-                    </button>
-                </div>
+            <!-- Archiv Container -->
+            <div id="archive-list" class="space-y-6">
+                <!-- Archiv-Einträge werden hier dynamisch eingefügt -->
             </div>
             
-        </main>
-
-        <!-- Fußzeile -->
-        <footer class="bg-gray-800 text-white p-6 mt-auto">
-            <div class="container mx-auto text-center text-sm">
-                <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
+            <!-- Wenn Archiv leer ist -->
+            <div id="empty-archive-message" class="hidden bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg shadow-inner mt-10">
+                <p class="text-sm font-medium text-yellow-800">
+                    <svg class="inline-block w-5 h-5 mr-2 -mt-0.5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h.01a1 1 0 100-2H10V9a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    Das Archiv ist leer. Archivieren Sie Gutschriften im Dashboard, um sie hier anzuzeigen.
+                </p>
             </div>
-        </footer>
-        
-    </div> <!-- Ende app-container -->
+
+            <!-- Button zum Löschen des gesamten Archivs -->
+            <div class="mt-10 pt-6 border-t border-gray-200 flex justify-end">
+                <button id="clear-all-button" onclick="window.confirmClearAll()" class="px-6 py-2 text-base font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 transition duration-300 shadow-lg disabled:opacity-50" disabled>
+                    Gesamtes Archiv endgültig löschen
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="bg-gray-800 text-white p-6 mt-auto">
+        <div class="container mx-auto text-center text-sm">
+            <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
+        </div>
+    </footer>
     
     <!-- Benutzerdefiniertes Bestätigungs-Modal (ersetzt prompt/confirm) -->
     <div id="confirmation-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300">
@@ -153,38 +92,6 @@
             </div>
         </div>
     </div>
-    
-    <!-- NEUES DETAIL-MODAL (Zeigt die volle Gutschrift an) -->
-    <div id="detail-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300">
-        <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full h-[90vh] flex flex-col transform transition-all duration-300 scale-100">
-            
-            <!-- Modal Header -->
-            <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50 rounded-t-xl">
-                <h3 class="text-2xl font-bold text-gray-900" id="detail-modal-title">Gutschrift-Details</h3>
-                <div class="flex space-x-3">
-                    <!-- PDF Export Button -->
-                    <button onclick="window.exportToPDF()" class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-lg hover:bg-blue-200 transition duration-150 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Als PDF speichern
-                    </button>
-                    <!-- Close Button -->
-                    <button onclick="document.getElementById('detail-modal').classList.add('hidden')" class="text-gray-500 hover:text-gray-800 transition duration-150">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Modal Body (Scrolable Content) -->
-            <div class="p-6 flex-grow overflow-y-auto" id="detail-modal-content">
-                <!-- Gutschrift Details werden hier eingefügt -->
-            </div>
-            
-        </div>
-    </div>
-    <!-- ENDE NEUES DETAIL-MODAL -->
-    
-    <!-- VERSTECKTER INHALTS-CONTAINER NUR FÜR DEN DRUCK -->
-    <div id="print-content" class="hidden"></div>
 
 
     <!-- JavaScript für die Archiv-Logik -->
@@ -192,82 +99,10 @@
         document.getElementById('year').textContent = new Date().getFullYear();
         let actionOnConfirm = null; 
         let actionParam = null;
-        let currentSessionData = null; // Speichert die aktuell angezeigte Sitzung für den PDF Export
 
-        // --- Zwingende Sicherheitsprüfung für JEDE Seite ---
-        function checkAuth() {
-            const loginScreen = document.getElementById('login-screen');
-            const appContainer = document.getElementById('app-container');
-
-            // Wenn der "isLoggedIn"-Flag nicht in der Session gesetzt ist...
-            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-                // Das Login-Formular direkt auf dieser Seite anzeigen
-                if (loginScreen) {
-                    // Setze es sichtbar und blende den Inhalt aus
-                    loginScreen.classList.remove('hidden');
-                    loginScreen.style.opacity = '1';
-                }
-                if (appContainer) {
-                    appContainer.classList.add('hidden');
-                    appContainer.style.opacity = '0';
-                }
-            } else {
-                // Bei erfolgreichem Login den App-Container anzeigen.
-                if (appContainer) {
-                    appContainer.classList.remove('hidden');
-                    appContainer.style.opacity = '1';
-                }
-                // Login-Screen ausblenden
-                if (loginScreen) {
-                     loginScreen.classList.add('hidden');
-                     loginScreen.style.opacity = '0';
-                }
-            }
-        }
-
-        // Global verfügbare Logout-Funktion
-        window.logout = function() {
-            sessionStorage.removeItem('isLoggedIn');
-            window.location.href = 'index.html'; 
-        }
-        
-        // --- Login Formular (muss auf jeder geschützten Seite vorhanden sein, damit checkAuth funktioniert)
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('login-form');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-        });
-        
-        const CORRECT_USERNAME = 'admin';
-        const CORRECT_PASSWORD = 'admin';
-
-        function handleLogin(event) {
-            event.preventDefault();
-
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
-            const errorMessage = document.getElementById('error-message');
-
-            const username = usernameInput.value.trim();
-            const password = passwordInput.value.trim();
-
-            if (username === CORRECT_USERNAME && password === CORRECT_PASSWORD) {
-                sessionStorage.setItem('isLoggedIn', 'true');
-                errorMessage.classList.add('hidden');
-                
-                // Nach erfolgreicher Anmeldung die Seite neu laden, um den Inhalt anzuzeigen
-                window.location.reload(); 
-            } else {
-                errorMessage.classList.remove('hidden');
-                passwordInput.value = ''; // Passwortfeld leeren
-            }
-        }
-        // --------------------------------------------------
-
-
-        // --- MODAL FUNKTIONEN (ersetzt prompt/confirm) ---
-
+        /**
+         * Zeigt das Bestätigungs-Modal an.
+         */
         window.showConfirmation = function(title, message, onConfirmAction, param = null, confirmText = 'Bestätigen') {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
@@ -287,6 +122,9 @@
             actionParam = param;
         }
         
+        /**
+         * Versteckt das Bestätigungs-Modal und führt die Aktion aus (falls bestätigt).
+         */
         window.hideConfirmation = function(confirmed) {
             document.getElementById('confirmation-modal').classList.add('hidden');
             if (confirmed && actionOnConfirm) {
@@ -295,108 +133,175 @@
             actionOnConfirm = null;
             actionParam = null;
         }
-        
-        // --- ARCHIV FUNKTIONEN ---
 
         /**
-         * Rendert die Liste der archivierten Sitzungen als kompakte Tabelle.
+         * Lädt die archivierten Gutschrifts-Sitzungen aus dem localStorage.
          */
-        function renderArchive() {
-            const archiveList = document.getElementById('archive-list');
-            const noArchiveMessage = document.getElementById('no-archive-message');
-            // Stelle sicher, dass wir nur rendern, wenn der Benutzer angemeldet ist
-            if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
+        function loadArchivedEntries() {
+            try {
+                const data = localStorage.getItem('archivedEntries');
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                console.error("Fehler beim Laden der Archive:", e);
+                return [];
+            }
+        }
+
+        /**
+         * Löscht alle Archive und rendert die Liste neu.
+         */
+        window.handleClearAll = function() {
+            localStorage.removeItem('archivedEntries');
+            renderArchiveList();
             
-            archiveList.innerHTML = '';
-            
-            // Hole Archivdaten
-            const archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
+            // Optional: Feedback-Meldung anzeigen
+            alert("Das gesamte Archiv wurde endgültig gelöscht.");
+        }
+
+        /**
+         * Bestätigt das Löschen aller Archive.
+         */
+        window.confirmClearAll = function() {
+            window.showConfirmation(
+                'Gesamtes Archiv löschen', 
+                'Sind Sie sicher, dass Sie alle archivierten Gutschriften endgültig löschen möchten? Diese Aktion kann NICHT rückgängig gemacht werden!', 
+                window.handleClearAll, 
+                null,
+                'Ja, endgültig löschen'
+            );
+        }
+
+        /**
+         * Rendert die Liste der Archiv-Sitzungen.
+         */
+        function renderArchiveList() {
+            const archiveListContainer = document.getElementById('archive-list');
+            const archivedEntries = loadArchivedEntries();
+            const clearAllButton = document.getElementById('clear-all-button');
+            const emptyMessage = document.getElementById('empty-archive-message');
+
+            archiveListContainer.innerHTML = '';
 
             if (archivedEntries.length === 0) {
-                noArchiveMessage.classList.remove('hidden');
+                clearAllButton.disabled = true;
+                emptyMessage.classList.remove('hidden');
                 return;
             }
-            noArchiveMessage.classList.add('hidden');
+            
+            clearAllButton.disabled = false;
+            emptyMessage.classList.add('hidden');
 
-            archivedEntries.forEach((session, index) => {
-                // Ermittle den ersten Kundennamen für die Überschrift
-                const customerName = session.entries && session.entries.length > 0 
-                    ? session.entries[0].kunde || 'Unbekannt' 
-                    : 'Unbekannt';
+            archivedEntries.forEach(session => {
+                // Finde den ersten Kunden (alle Logs in einer Session sind normalerweise für denselben Kunden)
+                const firstCustomer = session.entries.length > 0 ? session.entries[0].kunde : 'N/A';
+                
+                // Erstelle das Haupt-Card-Element
+                const card = document.createElement('div');
+                card.id = `session-${session.id}`;
+                card.className = 'bg-white shadow-xl rounded-xl p-6 border-t-4 border-blue-500';
+
+                // Basis-Informationen
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 border-b pb-4">
+                        <h2 class="text-xl font-bold text-blue-700">Archiv #${session.id}</h2>
+                        <span class="text-sm text-gray-500 mt-1 sm:mt-0">Archiviert am: ${session.timestamp}</span>
+                    </div>
                     
-                const rowHtml = `
-                    <tr class="hover:bg-blue-50 cursor-pointer transition duration-150" 
-                        onclick="window.viewArchiveDetails(${index})">
-                        <td class="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${customerName}</td>
-                        <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-500">${session.timestamp}</td>
-                        <td class="px-6 py-3 whitespace-nowrap text-sm text-right font-semibold">${session.totalVolume.toFixed(3)} fm</td>
-                        <td class="px-6 py-3 whitespace-nowrap text-sm text-right font-bold text-green-700">${session.totalBruttoPrice.toFixed(2)} €</td>
-                        <td class="px-6 py-3 whitespace-nowrap text-right">
-                             <svg class="w-4 h-4 text-blue-500 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                        </td>
-                    </tr>
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                        <!-- Kunde -->
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <p class="text-gray-500 font-medium">Kunde:</p>
+                            <p class="font-semibold text-gray-800 truncate">${firstCustomer}</p>
+                        </div>
+                        <!-- Stämme -->
+                        <div class="p-3 bg-gray-50 rounded-lg">
+                            <p class="text-gray-500 font-medium">Stämme:</p>
+                            <p class="font-semibold text-gray-800">${session.count}</p>
+                        </div>
+                        <!-- Gesamtvolumen -->
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <p class="text-gray-500 font-medium">Gesamt-Volumen:</p>
+                            <p class="font-bold text-blue-800">${session.totalVolume} fm</p>
+                        </div>
+                        <!-- Gesamtpreis Brutto -->
+                        <div class="p-3 bg-green-50 rounded-lg">
+                            <p class="text-gray-500 font-medium">Gesamt-Brutto:</p>
+                            <p class="font-bold text-green-800">${session.totalBruttoPrice} €</p>
+                        </div>
+                    </div>
+
+                    <!-- Detail-Bereich (wird per JS befüllt) -->
+                    <div id="details-${session.id}" class="details-section hidden mt-6 pt-4 border-t border-gray-200">
+                        <!-- Tabelle wird hier eingefügt -->
+                    </div>
+
+                    <!-- Aktionen -->
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button onclick="window.toggleDetails(${session.id})" class="toggle-button px-4 py-2 text-sm font-semibold text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition duration-300">
+                            Details anzeigen
+                        </button>
+                    </div>
                 `;
-                archiveList.insertAdjacentHTML('beforeend', rowHtml);
+                
+                archiveListContainer.appendChild(card);
             });
         }
         
         /**
-         * Zeigt die vollständige Gutschrift in einem Modal an.
-         * @param {number} index - Der Index der Sitzung in archivedEntries.
+         * Zeigt oder versteckt die detaillierte Tabelle für eine Archiv-Sitzung.
          */
-        window.viewArchiveDetails = function(index) {
-            const archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
-            const session = archivedEntries[index];
-            if (!session) return;
+        window.toggleDetails = function(sessionId) {
+            const detailsElement = document.getElementById(`details-${sessionId}`);
+            const toggleButton = detailsElement.closest('.bg-white').querySelector('.toggle-button');
             
-            // Speichere die Sitzungsdaten für den PDF-Export
-            currentSessionData = session;
+            if (detailsElement.classList.contains('hidden')) {
+                // Anzeigen
+                const archivedEntries = loadArchivedEntries();
+                const session = archivedEntries.find(s => s.id === sessionId);
+                
+                if (session) {
+                    detailsElement.innerHTML = generateDetailTableHTML(session.entries);
+                    detailsElement.classList.remove('hidden');
+                    toggleButton.textContent = 'Details ausblenden';
+                }
+            } else {
+                // Ausblenden
+                detailsElement.classList.add('hidden');
+                toggleButton.textContent = 'Details anzeigen';
+            }
+        }
 
-            const customerName = session.entries && session.entries.length > 0 
-                ? session.entries[0].kunde || 'Unbekannt' 
-                : 'Unbekannt';
-
-            document.getElementById('detail-modal-title').textContent = `Gutschrift für ${customerName} (Archiviert am ${session.timestamp})`;
-            const content = document.getElementById('detail-modal-content');
-            
-            // Header-Sektion für die Gutschrift
-            let headerHtml = `
-                <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 class="text-xl font-bold text-blue-800">Gutschrift Zusammenfassung</h4>
-                    <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
-                        <p><span class="font-semibold">Kunde:</span> ${customerName}</p>
-                        <p><span class="font-semibold">Datum:</span> ${session.timestamp}</p>
-                        <p><span class="font-semibold">Erfasste Stämme:</span> ${session.count}</p>
-                        <p><span class="font-semibold">Gesamtvolumen:</span> <span class="text-blue-700 font-bold">${session.totalVolume.toFixed(3)} fm</span></p>
-                        <p class="col-span-2"><span class="font-semibold">Brutto-Gesamtpreis:</span> <span class="text-green-700 text-lg font-extrabold">${session.totalBruttoPrice.toFixed(2)} €</span></p>
-                    </div>
-                </div>
-            `;
-            
-            // Tabelle der einzelnen Stämme
-            let tableRows = session.entries.map(entry => `
+        /**
+         * Erstellt den HTML-Code für die detaillierte Stamm-Tabelle.
+         */
+        function generateDetailTableHTML(entries) {
+            let tableRows = entries.map((entry, index) => `
                 <tr class="hover:bg-gray-50">
-                    <td class="px-3 py-2 whitespace-nowrap text-xs">${entry.holzart}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-xs">${entry.qualitaet}</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-xs text-right">${entry.laenge.toFixed(2)} m</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-xs text-right">${entry.durchmesser.toFixed(1)} cm</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-xs text-right font-semibold">${entry.festmeter.toFixed(3)} fm</td>
-                    <td class="px-3 py-2 whitespace-nowrap text-xs text-right font-bold text-green-700">${entry.bruttoPrice.toFixed(2)} €</td>
+                    <td class="px-3 py-2 text-left text-xs font-medium text-gray-900">${index + 1}</td>
+                    <td class="px-3 py-2 text-left text-xs text-gray-600">${entry.holzart}</td>
+                    <td class="px-3 py-2 text-left text-xs text-gray-600">${entry.qualitaet}</td>
+                    <td class="px-3 py-2 text-right text-xs text-gray-600">${entry.laenge.toFixed(2)} m</td>
+                    <td class="px-3 py-2 text-right text-xs text-gray-600">${entry.durchmesser.toFixed(1)} cm</td>
+                    <td class="px-3 py-2 text-center text-xs font-semibold text-blue-700">${entry.classification}</td>
+                    <td class="px-3 py-2 text-right text-xs font-bold text-blue-800 bg-blue-50">${entry.festmeter.toFixed(3)} fm</td>
+                    <td class="px-3 py-2 text-right text-xs text-green-700">${entry.bruttoPrice.toFixed(2)} €</td>
                 </tr>
             `).join('');
 
-            let tableHtml = `
-                <h4 class="text-xl font-bold text-gray-800 mb-4">Erfasste Stämme im Detail</h4>
-                <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200">
+            return `
+                <h3 class="text-lg font-bold text-gray-700 mb-3">Detaillierte Stämme dieser Gutschrift:</h3>
+                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                    <table class="min-w-full divide-y divide-gray-200 table-font">
                         <thead class="bg-gray-100">
                             <tr>
+                                <th class="px-3 py-2 text-left text-xs font-bold text-gray-600 uppercase">Nr.</th>
                                 <th class="px-3 py-2 text-left text-xs font-bold text-gray-600 uppercase">Holzart</th>
                                 <th class="px-3 py-2 text-left text-xs font-bold text-gray-600 uppercase">Qualität</th>
                                 <th class="px-3 py-2 text-right text-xs font-bold text-gray-600 uppercase">Länge</th>
                                 <th class="px-3 py-2 text-right text-xs font-bold text-gray-600 uppercase">Ø</th>
-                                <th class="px-3 py-2 text-right text-xs font-bold text-gray-600 uppercase">Volumen</th>
-                                <th class="px-3 py-2 text-right text-xs font-bold text-gray-600 uppercase">Brutto (€)</th>
+                                <th class="px-3 py-2 text-center text-xs font-bold text-gray-600 uppercase">Klass.</th>
+                                <th class="px-3 py-2 text-right text-xs font-bold text-gray-600 uppercase">Festmeter</th>
+                                <th class="px-3 py-2 text-right text-xs font-bold text-gray-600 uppercase">Brutto</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-100">
@@ -405,101 +310,11 @@
                     </table>
                 </div>
             `;
-
-            content.innerHTML = headerHtml + tableHtml;
-            document.getElementById('detail-modal').classList.remove('hidden');
         }
 
 
-        /**
-         * Bestätigungs-Modal für das Löschen des gesamten Archivs.
-         */
-        window.confirmClearArchive = function() {
-            const archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
-            if (archivedEntries.length === 0) {
-                 // Verwenden Sie das Modal anstelle von alert()
-                 window.showConfirmation(
-                    'Archiv ist leer',
-                    'Das Archiv ist bereits leer. Es gibt nichts zu löschen.',
-                    null,
-                    null,
-                    'OK'
-                );
-                 return;
-            }
-            window.showConfirmation(
-                'Gesamtes Archiv löschen', 
-                `Sind Sie sicher, dass Sie alle ${archivedEntries.length} archivierten Sitzungen endgültig löschen möchten? Diese Daten gehen unwiederbringlich verloren!`, 
-                window.handleClearArchive, 
-                null,
-                'Ja, endgültig löschen'
-            );
-        }
-
-        /**
-         * Löscht das gesamte Archiv aus dem localStorage.
-         */
-        window.handleClearArchive = function() {
-            localStorage.removeItem('archivedEntries');
-            renderArchive(); // Tabelle neu rendern
-            
-            // Zeige eine Erfolgsmeldung
-            const feedback = document.getElementById('archive-list').parentNode; // Übergeordnetes Element der Tabelle
-            feedback.insertAdjacentHTML('afterbegin', 
-                '<div class="p-4 bg-green-100 text-green-700 rounded-lg mb-4 font-semibold text-center transition-opacity duration-300" id="archive-feedback">Archiv erfolgreich gelöscht!</div>'
-            );
-            setTimeout(() => {
-                const feedbackDiv = document.getElementById('archive-feedback');
-                if (feedbackDiv) feedbackDiv.remove();
-            }, 3000);
-        }
-
-        /**
-         * Exportiert die aktuell im Modal angezeigte Gutschrift als PDF (über window.print).
-         */
-        window.exportToPDF = function() {
-            if (!currentSessionData) {
-                 window.showConfirmation('Fehler', 'Es ist keine Gutschrift zum Exportieren ausgewählt.', null, null, 'OK');
-                 return;
-            }
-
-            const printContainer = document.getElementById('print-content');
-            
-            // Kopiere den Inhalt des Detail-Modals, aber ohne Header und Footer des Modals
-            const contentToPrint = document.getElementById('detail-modal-content').innerHTML;
-
-            const customerName = currentSessionData.entries && currentSessionData.entries.length > 0 
-                ? currentSessionData.entries[0].kunde || 'Unbekannt' 
-                : 'Unbekannt';
-
-            // Erstelle das PDF-Layout (minimales Styling, das für den Druck geeignet ist)
-            printContainer.innerHTML = `
-                <div class="p-8 text-gray-900" style="font-family: sans-serif; font-size: 12pt;">
-                    <h1 style="font-size: 24pt; font-weight: bold; color: #1e40af; border-bottom: 2px solid #3b82f6; padding-bottom: 5px; margin-bottom: 20px;">
-                        Gutschrift - Sägewerk Mülleder
-                    </h1>
-                    
-                    <h2 style="font-size: 16pt; font-weight: bold; margin-bottom: 5px;">Für: ${customerName}</h2>
-                    <p style="font-size: 10pt; margin-bottom: 20px;">Archiviert am: ${currentSessionData.timestamp}</p>
-                    
-                    ${contentToPrint}
-
-                    <div style="margin-top: 40px; border-top: 1px dashed #ccc; padding-top: 10px; font-size: 10pt; text-align: center;">
-                        Dies ist ein automatischer Gutschrift-Export.
-                    </div>
-                </div>
-            `;
-            
-            // Druckvorgang starten
-            window.print();
-        }
-
-
-        // Start beim Laden
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuth(); // WICHTIG: Prüft die Anmeldung
-            renderArchive(); // Zeigt die archivierten Daten an
-        });
+        // Initiales Rendern der Liste beim Laden der Seite
+        document.addEventListener('DOMContentLoaded', renderArchiveList);
     </script>
 </body>
 </html>
