@@ -21,163 +21,111 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Ladeanzeige/Fallback: Wird angezeigt, bis checkAuth abgeschlossen ist -->
-    <div id="loading-screen" class="absolute inset-0 bg-gray-50 flex items-center justify-center z-50">
-        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-        <p class="ml-4 text-gray-600">Lade und prüfe Authentifizierung...</p>
-    </div>
+    <!-- Navigationsleiste -->
+    <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
+            <a href="index.html" class="text-xl font-bold text-blue-600">Sägewerk Mülleder</a>
+            <div class="flex space-x-4">
+                <a href="index.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Dashboard</a>
+                <a href="archiv.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Archiv</a>
+                <a href="kunden.html" class="text-blue-600 font-semibold hover:text-blue-800 transition duration-300 border-b-2 border-blue-600 pb-1">Kunden</a>
+                <a href="preise.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Preise</a>
+                <a href="preisdokument.html" target="_blank" class="text-gray-600 hover:text-blue-600 transition duration-300" title="Öffnet die vollständige Preisliste in Druckansicht">Gesamt-Preise (PDF)</a>
+            </div>
+        </div>
+    </nav>
 
-    <!-- Haupt-App-Container - Startet versteckt, wird nur bei erfolgreicher Authentifizierung sichtbar -->
-    <div id="app-container" class="hidden min-h-screen flex flex-col w-full">
+    <!-- Hauptinhalt -->
+    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2">Kundenstamm verwalten</h1>
 
-        <!-- Navigationsleiste -->
-        <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
-            <div class="container mx-auto flex justify-between items-center max-w-7xl">
-                <a href="index.html" class="text-xl font-bold text-blue-600">Sägewerk Mülleder</a>
-                <div class="flex space-x-4 items-center">
-                    <a href="index.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Dashboard</a>
-                    <a href="archiv.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Archiv</a>
-                    <a href="kunden.html" class="text-blue-600 font-semibold hover:text-blue-800 transition duration-300 border-b-2 border-blue-600 pb-1">Kunden</a>
-                    <a href="preise.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Preise</a>
-                    <a href="preisdokument.html" target="_blank" class="text-gray-600 hover:text-blue-600 transition duration-300" title="Öffnet die vollständige Preisliste in Druckansicht">Gesamt-Preise (PDF)</a>
-                    
-                    <!-- Logout Button hinzugefügt -->
-                    <button onclick="window.logout()" class="ml-4 py-2 px-4 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 transition duration-300 text-sm font-semibold">
-                        Logout
-                    </button>
+        <!-- Kunden-Anlageformular -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Neuen Kunden anlegen</h2>
+            <form id="customer-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+                <!-- 1. Name -->
+                <div class="md:col-span-2">
+                    <label for="vorname" class="block text-sm font-medium text-gray-700">Vorname <span class="text-red-500">*</span></label>
+                    <input type="text" id="vorname" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                 </div>
-            </div>
-        </nav>
+                <div class="md:col-span-2">
+                    <label for="nachname" class="block text-sm font-medium text-gray-700">Nachname <span class="text-red-500">*</span></label>
+                    <input type="text" id="nachname" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
 
-        <!-- Hauptinhalt -->
-        <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
-            <h1 class="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-2">Kundenstamm verwalten</h1>
-
-            <!-- Kunden-Anlageformular -->
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-8">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Neuen Kunden anlegen</h2>
-                <form id="customer-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-                    <!-- 1. Name -->
-                    <div class="md:col-span-2">
-                        <label for="vorname" class="block text-sm font-medium text-gray-700">Vorname <span class="text-red-500">*</span></label>
-                        <input type="text" id="vorname" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="nachname" class="block text-sm font-medium text-gray-700">Nachname <span class="text-red-500">*</span></label>
-                        <input type="text" id="nachname" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-
-                    <!-- 2. Adresse -->
-                    <div class="md:col-span-2">
-                        <label for="adresse" class="block text-sm font-medium text-gray-700">Straße <span class="text-red-500">*</span></label>
-                        <input type="text" id="adresse" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label for="hausnummer" class="block text-sm font-medium text-gray-700">Hausnummer <span class="text-red-500">*</span></label>
-                        <input type="text" id="hausnummer" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-                    <div class="md:col-span-1">
-                        <label for="plz" class="block text-sm font-medium text-gray-700">PLZ <span class="text-red-500">*</span></label>
-                        <input type="text" id="plz" required pattern="[0-9]{4,5}" title="4-5 Zahlen" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-                    
-                    <!-- 3. Ort & Optional -->
-                    <div class="md:col-span-4">
-                        <label for="ort" class="block text-sm font-medium text-gray-700">Ort <span class="text-red-500">*</span></label>
-                        <input type="text" id="ort" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-                    
-                    <!-- 4. Optional -->
-                    <div class="md:col-span-2">
-                        <label for="handy" class="block text-sm font-medium text-gray-700">Handynummer (optional)</label>
-                        <input type="tel" id="handy" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="email" class="block text-sm font-medium text-gray-700">E-Mail (optional)</label>
-                        <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
-                    </div>
-
-                    <div class="md:col-span-4 mt-4">
-                        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
-                            Kunden speichern
-                        </button>
-                        <p id="feedback" class="text-center mt-2 hidden text-sm font-medium"></p>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Kundenliste Tabelle -->
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Liste der gespeicherten Kunden</h2>
+                <!-- 2. Adresse -->
+                <div class="md:col-span-2">
+                    <label for="adresse" class="block text-sm font-medium text-gray-700">Straße <span class="text-red-500">*</span></label>
+                    <input type="text" id="adresse" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div class="md:col-span-1">
+                    <label for="hausnummer" class="block text-sm font-medium text-gray-700">Hausnummer <span class="text-red-500">*</span></label>
+                    <input type="text" id="hausnummer" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div class="md:col-span-1">
+                    <label for="plz" class="block text-sm font-medium text-gray-700">PLZ <span class="text-red-500">*</span></label>
+                    <input type="text" id="plz" required pattern="[0-9]{4,5}" title="4-5 Zahlen" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
                 
-                <div class="table-container">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50 sticky top-0">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adresse</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Kontaktdaten</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aktion</th>
-                            </tr>
-                        </thead>
-                        <tbody id="customer-list-body" class="bg-white divide-y divide-gray-200">
-                            <!-- Kunden werden hier dynamisch eingefügt -->
-                        </tbody>
-                    </table>
+                <!-- 3. Ort & Optional -->
+                <div class="md:col-span-4">
+                    <label for="ort" class="block text-sm font-medium text-gray-700">Ort <span class="text-red-500">*</span></label>
+                    <input type="text" id="ort" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
                 </div>
-                <p id="no-customers-message" class="text-center text-gray-500 mt-4 text-sm hidden">Noch keine Kunden angelegt.</p>
-            </div>
+                
+                <!-- 4. Optional -->
+                <div class="md:col-span-2">
+                    <label for="handy" class="block text-sm font-medium text-gray-700">Handynummer (optional)</label>
+                    <input type="tel" id="handy" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="email" class="block text-sm font-medium text-gray-700">E-Mail (optional)</label>
+                    <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                </div>
 
-        </main>
+                <div class="md:col-span-4 mt-4">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
+                        Kunden speichern
+                    </button>
+                    <p id="feedback" class="text-center mt-2 hidden text-sm font-medium"></p>
+                </div>
+            </form>
+        </div>
 
-        <!-- Fußzeile -->
-        <footer class="bg-gray-800 text-white p-4 mt-auto">
-            <div class="container mx-auto text-center text-sm">
-                <p>&copy; <span id="year-footer"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
+        <!-- Kundenliste Tabelle -->
+        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Liste der gespeicherten Kunden</h2>
+            
+            <div class="table-container">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50 sticky top-0">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adresse</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Kontaktdaten</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aktion</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customer-list-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Kunden werden hier dynamisch eingefügt -->
+                    </tbody>
+                </table>
             </div>
-        </footer>
-    </div> <!-- Ende app-container -->
+             <p id="no-customers-message" class="text-center text-gray-500 mt-4 text-sm hidden">Noch keine Kunden angelegt.</p>
+        </div>
+
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="bg-gray-800 text-white p-4 mt-auto">
+        <div class="container mx-auto text-center text-sm">
+            <p>&copy; <span id="year-footer"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
+        </div>
+    </footer>
 
     <script>
         document.getElementById('year-footer').textContent = new Date().getFullYear();
-
-        // --- AUTHENTIFIZIERUNGSLOGIK ---
-        // Dies ist eine geschützte Seite. Bei fehlender Authentifizierung wird auf index.html umgeleitet.
-
-        /**
-         * Funktion zur Überprüfung des Login-Status in SessionStorage.
-         * Leitet zur Hauptseite (index.html) weiter, wenn der Benutzer nicht angemeldet ist.
-         */
-        function checkAuth() {
-            // Lade-Screen verstecken, egal ob Authentifizierung erfolgreich ist oder nicht
-            document.getElementById('loading-screen').classList.add('hidden');
-
-            // Prüfen, ob der Login-Status in der Session gesetzt ist
-            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-                // Wenn nicht eingeloggt, zur Hauptseite (Login-Seite) weiterleiten.
-                // Wechsel von replace zurück zu href zur Behebung des SyntaxErrors.
-                window.location.href = 'index.html'; 
-            } else {
-                // Wenn eingeloggt, den Hauptinhalt anzeigen.
-                const appContainer = document.getElementById('app-container');
-                if (appContainer) {
-                    appContainer.classList.remove('hidden');
-                }
-            }
-        }
-
-        /**
-         * Global verfügbare Logout-Funktion.
-         * Löscht den Login-Status und leitet zur Hauptseite weiter.
-         */
-        window.logout = function() {
-            sessionStorage.removeItem('isLoggedIn');
-            // Zur Hauptseite weiterleiten
-            window.location.href = 'index.html'; // Wechsel von replace zurück zu href zur Behebung des SyntaxErrors.
-        }
-        // ----------------------------------
-
 
         // Funktion zum Generieren einer einfachen ID
         function generateId() {
@@ -305,14 +253,7 @@
         });
 
         // Initialisierung
-        document.addEventListener('DOMContentLoaded', () => {
-            // WICHTIG: Zuerst die Authentifizierung prüfen, bevor der Rest des Skripts ausgeführt wird
-            checkAuth();
-
-            // Erst wenn checkAuth erfolgreich ist, wird renderCustomers ausgeführt.
-            // (Da renderCustomers erst im if(sessionStorage.getItem('isLoggedIn') === 'true') Teil indirekt aufgerufen wird)
-            // Hier muss nur die DOM-Initalisierung stehen:
-        });
+        document.addEventListener('DOMContentLoaded', renderCustomers);
     </script>
 </body>
 </html>
