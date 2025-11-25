@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preise & Tarife</title>
+    <!-- Einbindung von Tailwind CSS für Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Setzt die Standard-Schriftart auf Inter und sorgt für eine fließende Höhe */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navigationsleiste -->
+    <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Logo oder Markenname -->
+            <a href="index.html" class="text-xl font-bold text-indigo-600">Ihr Unternehmen</a>
+            <!-- Navigationslinks -->
+            <div class="flex space-x-4">
+                <a href="index.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Startseite</a>
+                <a href="kunden.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Kunden</a>
+                <a href="preise.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition duration-300 border-b-2 border-indigo-600 pb-1">Preise</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hauptinhalt (Preis-Tabelle) -->
+    <main class="flex-grow container mx-auto p-8">
+        <div class="bg-white p-10 shadow-xl rounded-xl w-full max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl font-bold text-indigo-600 mb-4">Wählen Sie Ihren passenden Tarif</h1>
+            <p class="text-lg text-gray-600 mb-10">
+                Transparente Preise ohne versteckte Kosten. Starten Sie noch heute!
+            </p>
+
+            <!-- Preiskarten-Grid -->
+            <div class="grid md:grid-cols-3 gap-8">
+                
+                <!-- Tarif 1: Basis -->
+                <div class="flex flex-col bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Basis</h2>
+                    <p class="text-4xl font-extrabold text-indigo-600 mb-4">
+                        <span class="text-xl align-top">€</span>19<span class="text-xl font-medium">/Monat</span>
+                    </p>
+                    <ul class="text-left space-y-3 text-gray-600 flex-grow mb-6">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Einfache Funktionen
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            5 Projekte inklusive
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            Kein Premium-Support
+                        </li>
+                    </ul>
+                    <a href="#" class="block w-full text-center px-6 py-3 border border-indigo-600 text-indigo-600 font-medium rounded-lg hover:bg-indigo-100 transition duration-300">
+                        Jetzt starten
+                    </a>
+                </div>
+
+                <!-- Tarif 2: Premium (Empfohlen) -->
+                <div class="flex flex-col bg-indigo-600 p-8 rounded-xl shadow-2xl scale-105 transform border-4 border-indigo-300">
+                    <p class="text-xs font-bold text-white uppercase tracking-wider mb-2">Am beliebtesten</p>
+                    <h2 class="text-3xl font-bold text-white mb-4">Premium</h2>
+                    <p class="text-5xl font-extrabold text-white mb-4">
+                        <span class="text-xl align-top">€</span>49<span class="text-xl font-medium">/Monat</span>
+                    </p>
+                    <ul class="text-left space-y-3 text-indigo-100 flex-grow mb-6">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Alle Basis-Funktionen
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Unbegrenzte Projekte
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-300 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            24/7 Premium-Support
+                        </li>
+                    </ul>
+                    <a href="#" class="block w-full text-center px-6 py-3 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100 transition duration-300 shadow-md">
+                        Premium buchen
+                    </a>
+                </div>
+
+                <!-- Tarif 3: Enterprise -->
+                <div class="flex flex-col bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Enterprise</h2>
+                    <p class="text-4xl font-extrabold text-indigo-600 mb-4">
+                        <span class="text-xl align-top">€</span>Kontakt<span class="text-xl font-medium">/Monat</span>
+                    </p>
+                    <ul class="text-left space-y-3 text-gray-600 flex-grow mb-6">
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Dedizierter Server
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Individuelle Lösungen
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Persönlicher Account Manager
+                        </li>
+                    </ul>
+                    <a href="#" class="block w-full text-center px-6 py-3 border border-indigo-600 text-indigo-600 font-medium rounded-lg hover:bg-indigo-100 transition duration-300">
+                        Angebot anfordern
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="bg-gray-800 text-white p-4 mt-auto">
+        <div class="container mx-auto text-center text-sm">
+            <p>&copy; <span id="year"></span> Ihr Unternehmen. Alle Rechte vorbehalten.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript für das aktuelle Jahr in der Fußzeile -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
