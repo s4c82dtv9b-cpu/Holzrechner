@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Holzrechner Dashboard (Archivierungs-Fix)</title>
+    <title>Holzrechner Dashboard (Geschützt)</title>
     <!-- Einbindung von Tailwind CSS für Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -31,172 +31,204 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Navigationsleiste -->
-    <nav class="bg-white shadow-xl p-4 sticky top-0 z-10">
-        <div class="container mx-auto flex justify-between items-center max-w-7xl">
-            <!-- Logo oder Markenname -->
-            <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
-            <!-- Navigationslinks mit ARCHIV -->
-            <div class="flex space-x-6">
-                <a href="index.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Dashboard</a>
-                <a href="archiv.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Archiv</a>
-                <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
-                <a href="preise.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Preise</a>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hauptinhalt (Dashboard Ansicht) -->
-    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
-        <div class="w-full mx-auto">
-            <!-- HAUPTTITEL FÜR DIE SEITE -->
-            <h1 class="text-4xl font-extrabold text-green-700 mb-8 text-center sm:text-left">
-                Holzrechner Sägewerk Mülleder
-            </h1>
-
-            <!-- SEKTION: Holzrechner -->
-            <div class="bg-white p-6 sm:p-10 shadow-2xl rounded-xl w-full mb-10 border-t-6 border-blue-600">
-                
-                <!-- ÜBERSCHRIFT -->
-                <h2 class="text-3xl font-bold text-blue-700 mb-8">Holzrechner</h2>
-                
-                <!-- Geänderte Grid-Struktur für 6 Spalten auf MD+ (5 Eingaben + 1 Ausgabe, jetzt 2 Ausgaben) -->
-                <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-7 gap-6 items-end">
-                    
-                    <!-- Verstecktes Feld zur Speicherung der ID bei Bearbeitung -->
-                    <input type="hidden" id="editing-id" value="">
-                    
-                    <!-- Feld: Kunde (2 Spalten auf Mobile, 1 auf MD+) -->
-                    <div class="col-span-2 md:col-span-1">
-                        <label for="kunde" class="block text-sm font-semibold text-gray-700">Kunde</label>
-                        <input type="text" id="kunde" name="kunde" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="Name des Kunden">
-                    </div>
-                    
-                    <!-- Feld: Holzart -->
-                    <div class="col-span-1">
-                        <label for="holzart" class="block text-sm font-semibold text-gray-700">Holzart</label>
-                        <select id="holzart" name="holzart" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
-                            <option value="Fichte">Fichte</option>
-                            <option value="Tanne">Tanne</option>
-                            <option value="Eiche">Eiche</option>
-                            <option value="Lärche">Lärche</option>
-                            <option value="Kiefer">Kiefer</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Feld: Qualität (ehemals Holzklasse) -->
-                    <div class="col-span-1">
-                        <label for="qualitaet" class="block text-sm font-semibold text-gray-700">Qualität</label>
-                        <select id="qualitaet" name="qualitaet" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
-                            <option value="A/B">A/B</option>
-                            <option value="B-Braunkern">B (Braunkern)</option>
-                            <option value="CX">CX</option>
-                            <option value="Käferholz">Käferholz</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Feld: Länge (mit Enter-Funktion) -->
-                    <div class="col-span-1">
-                        <label for="laenge" class="block text-sm font-semibold text-gray-700">Länge (m)</label>
-                        <input type="number" step="0.01" id="laenge" name="laenge" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 4.0">
-                    </div>
-
-                    <!-- Feld: Mitteldurchmesser (mit Enter-Funktion) -->
-                    <div class="col-span-1">
-                        <label for="durchmesser" class="block text-sm font-semibold text-gray-700">Mitteldurchmesser (cm)</label>
-                        <input type="number" step="0.1" id="durchmesser" name="durchmesser" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 25.5">
-                    </div>
-                    
-                    <!-- Feld: Netto Preis Anzeige (Ausgabe) - BEIBEHALTEN ALS FEEDBACK -->
-                    <div class="col-span-1">
-                        <label class="block text-sm font-semibold text-gray-700">Einzelpreis NETTO (€)</label>
-                        <div id="calculated-price-netto" class="mt-1 block w-full rounded-lg shadow-sm p-3 border border-blue-200 bg-blue-50 text-blue-700 font-bold text-center">
-                            0.00 €
-                        </div>
-                    </div>
-                    
-                    <!-- Feld: Brutto Preis Anzeige (Ausgabe) - BEIBEHALTEN ALS FEEDBACK -->
-                    <div class="col-span-1">
-                        <label class="block text-sm font-semibold text-gray-700">Einzelpreis BRUTTO (€)</label>
-                        <div id="calculated-price-brutto" class="mt-1 block w-full rounded-lg shadow-sm p-3 border border-green-200 bg-green-50 text-green-700 font-bold text-center">
-                            0.00 €
-                        </div>
-                    </div>
-
-                    <!-- Button: Speichern (volle Breite auf Mobile, 7 Spalten auf MD+) -->
-                    <div class="col-span-2 md:col-span-7 flex justify-end mt-4">
-                        <button type="submit" id="save-button" class="w-full sm:w-auto px-10 py-3 text-base font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-md hover:shadow-lg">
-                            Stamm speichern (oder Enter in Ø)
-                        </button>
-                    </div>
-                    
-                    <!-- Feedback Message -->
-                    <div id="feedback-message" class="col-span-2 md:col-span-7 text-sm font-semibold hidden pt-2"></div>
-                </form>
-            </div>
+    <!-- NEU: Anmeldebildschirm (Standardmäßig sichtbar) -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gray-50 fixed inset-0 z-50">
+        <div class="w-full max-w-md bg-white p-8 shadow-2xl rounded-xl border border-gray-100 transition-opacity duration-500 ease-in-out">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Zugriff erforderlich</h1>
+            <p id="error-message" class="text-red-600 font-medium mb-4 text-center hidden">Falscher Benutzername oder falsches Passwort.</p>
             
-            <!-- SEKTION: Eingegebene Stämme Tabelle -->
-            <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-12 border-t-6 border-gray-300">
-                <h2 class="text-3xl font-bold text-gray-700 mb-6">Erfasste Stämme & Gutschrifts-Daten</h2>
-                
-                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
-                    <table class="min-w-full divide-y divide-gray-200 table-font">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kunde</th>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Holzart</th>
-                                <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Länge (m)</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Ø (cm)</th>
-                                <th class="px-3 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Klassifizierung</th>
-                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Festmeter (fm)</th>
-                                <!-- Spalten für Preis Netto und Brutto wurden HIER entfernt -->
-                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="wood-table-body" class="bg-white divide-y divide-gray-100">
-                            <!-- Einträge werden hier dynamisch eingefügt -->
-                        </tbody>
-                        <tfoot>
-                            <!-- Colspan auf 6 reduziert, um unter Festmeter auszurichten. -->
-                            <tr class="bg-blue-50 font-extrabold border-t-2 border-blue-200">
-                                <td colspan="6" class="px-3 py-3 text-right text-sm text-blue-800">Gesamtvolumen:</td>
-                                <td id="total-volume" class="px-3 py-3 text-right text-sm text-blue-700">0.000 fm</td>
-                                <!-- Zellen für Gesamtpreis Netto und Brutto wurden HIER entfernt -->
-                                <td class="px-3 py-3"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Benutzername (admin)</label>
+                    <input type="text" id="username" name="username" required
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
+                           placeholder="Benutzername eingeben">
                 </div>
-                
-                <!-- Buttons für Archivierung und PDF -->
-                <div class="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
-                    <div class="flex space-x-3 w-full sm:w-auto">
-                        <button id="pdf-save-button" onclick="window.generatePDF()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition duration-300 shadow-md">
-                            Gutschrift als PDF
-                        </button>
-                        <!-- Der "Liste archivieren"-Button, der window.confirmArchive() aufruft. -->
-                        <button id="archive-table-button" onclick="window.confirmArchive()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-blue-700 bg-blue-100 rounded-xl hover:bg-blue-200 transition duration-300">
-                            Liste archivieren
-                        </button>
-                    </div>
-                    <!-- Liste leeren (als Alternative zur Archivierung) -->
-                    <button id="clear-table-button" onclick="window.confirmClear()" class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-300 border border-gray-200">
-                        Liste leeren (Verlust!)
-                    </button>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Passwort (admin)</label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
+                           placeholder="Passwort eingeben">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
+                    Anmelden
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Hauptinhalts-Container (NEU: Startet versteckt) -->
+    <div id="app-container" class="hidden opacity-0 min-h-screen flex flex-col w-full transition-opacity duration-500 ease-in-out">
+
+        <!-- Navigationsleiste -->
+        <nav class="bg-white shadow-xl p-4 sticky top-0 z-10">
+            <div class="container mx-auto flex justify-between items-center max-w-7xl">
+                <!-- Logo oder Markenname -->
+                <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
+                <!-- Navigationslinks mit ARCHIV -->
+                <div class="flex space-x-6">
+                    <a href="index.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Dashboard</a>
+                    <a href="archiv.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Archiv</a>
+                    <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
+                    <a href="preise.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Preise</a>
                 </div>
             </div>
+        </nav>
 
-            
-        </div>
-    </main>
+        <!-- Hauptinhalt (Dashboard Ansicht) -->
+        <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+            <div class="w-full mx-auto">
+                <!-- HAUPTTITEL FÜR DIE SEITE -->
+                <h1 class="text-4xl font-extrabold text-green-700 mb-8 text-center sm:text-left">
+                    Holzrechner Sägewerk Mülleder
+                </h1>
 
-    <!-- Fußzeile -->
-    <footer class="bg-gray-800 text-white p-6 mt-auto">
-        <div class="container mx-auto text-center text-sm">
-            <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
-        </div>
-    </footer>
+                <!-- SEKTION: Holzrechner -->
+                <div class="bg-white p-6 sm:p-10 shadow-2xl rounded-xl w-full mb-10 border-t-6 border-blue-600">
+                    
+                    <!-- ÜBERSCHRIFT -->
+                    <h2 class="text-3xl font-bold text-blue-700 mb-8">Holzrechner</h2>
+                    
+                    <!-- Geänderte Grid-Struktur für 6 Spalten auf MD+ (5 Eingaben + 1 Ausgabe, jetzt 2 Ausgaben) -->
+                    <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-7 gap-6 items-end">
+                        
+                        <!-- Verstecktes Feld zur Speicherung der ID bei Bearbeitung -->
+                        <input type="hidden" id="editing-id" value="">
+                        
+                        <!-- Feld: Kunde (2 Spalten auf Mobile, 1 auf MD+) -->
+                        <div class="col-span-2 md:col-span-1">
+                            <label for="kunde" class="block text-sm font-semibold text-gray-700">Kunde</label>
+                            <input type="text" id="kunde" name="kunde" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="Name des Kunden">
+                        </div>
+                        
+                        <!-- Feld: Holzart -->
+                        <div class="col-span-1">
+                            <label for="holzart" class="block text-sm font-semibold text-gray-700">Holzart</label>
+                            <select id="holzart" name="holzart" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
+                                <option value="Fichte">Fichte</option>
+                                <option value="Tanne">Tanne</option>
+                                <option value="Eiche">Eiche</option>
+                                <option value="Lärche">Lärche</option>
+                                <option value="Kiefer">Kiefer</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Feld: Qualität (ehemals Holzklasse) -->
+                        <div class="col-span-1">
+                            <label for="qualitaet" class="block text-sm font-semibold text-gray-700">Qualität</label>
+                            <select id="qualitaet" name="qualitaet" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
+                                <option value="A/B">A/B</option>
+                                <option value="B-Braunkern">B (Braunkern)</option>
+                                <option value="CX">CX</option>
+                                <option value="Käferholz">Käferholz</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Feld: Länge (mit Enter-Funktion) -->
+                        <div class="col-span-1">
+                            <label for="laenge" class="block text-sm font-semibold text-gray-700">Länge (m)</label>
+                            <input type="number" step="0.01" id="laenge" name="laenge" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 4.0">
+                        </div>
+
+                        <!-- Feld: Mitteldurchmesser (mit Enter-Funktion) -->
+                        <div class="col-span-1">
+                            <label for="durchmesser" class="block text-sm font-semibold text-gray-700">Mitteldurchmesser (cm)</label>
+                            <input type="number" step="0.1" id="durchmesser" name="durchmesser" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 25.5">
+                        </div>
+                        
+                        <!-- Feld: Netto Preis Anzeige (Ausgabe) - BEIBEHALTEN ALS FEEDBACK -->
+                        <div class="col-span-1">
+                            <label class="block text-sm font-semibold text-gray-700">Einzelpreis NETTO (€)</label>
+                            <div id="calculated-price-netto" class="mt-1 block w-full rounded-lg shadow-sm p-3 border border-blue-200 bg-blue-50 text-blue-700 font-bold text-center">
+                                0.00 €
+                            </div>
+                        </div>
+                        
+                        <!-- Feld: Brutto Preis Anzeige (Ausgabe) - BEIBEHALTEN ALS FEEDBACK -->
+                        <div class="col-span-1">
+                            <label class="block text-sm font-semibold text-gray-700">Einzelpreis BRUTTO (€)</label>
+                            <div id="calculated-price-brutto" class="mt-1 block w-full rounded-lg shadow-sm p-3 border border-green-200 bg-green-50 text-green-700 font-bold text-center">
+                                0.00 €
+                            </div>
+                        </div>
+
+                        <!-- Button: Speichern (volle Breite auf Mobile, 7 Spalten auf MD+) -->
+                        <div class="col-span-2 md:col-span-7 flex justify-end mt-4">
+                            <button type="submit" id="save-button" class="w-full sm:w-auto px-10 py-3 text-base font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-md hover:shadow-lg">
+                                Stamm speichern (oder Enter in Ø)
+                            </button>
+                        </div>
+                        
+                        <!-- Feedback Message -->
+                        <div id="feedback-message" class="col-span-2 md:col-span-7 text-sm font-semibold hidden pt-2"></div>
+                    </form>
+                </div>
+                
+                <!-- SEKTION: Eingegebene Stämme Tabelle -->
+                <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-12 border-t-6 border-gray-300">
+                    <h2 class="text-3xl font-bold text-gray-700 mb-6">Erfasste Stämme & Gutschrifts-Daten</h2>
+                    
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                        <table class="min-w-full divide-y divide-gray-200 table-font">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kunde</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Holzart</th>
+                                    <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
+                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Länge (m)</th>
+                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Ø (cm)</th>
+                                    <th class="px-3 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Klassifizierung</th>
+                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Festmeter (fm)</th>
+                                    <!-- Spalten für Preis Netto und Brutto wurden HIER entfernt -->
+                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wood-table-body" class="bg-white divide-y divide-gray-100">
+                                <!-- Einträge werden hier dynamisch eingefügt -->
+                            </tbody>
+                            <tfoot>
+                                <!-- Colspan auf 6 reduziert, um unter Festmeter auszurichten. -->
+                                <tr class="bg-blue-50 font-extrabold border-t-2 border-blue-200">
+                                    <td colspan="6" class="px-3 py-3 text-right text-sm text-blue-800">Gesamtvolumen:</td>
+                                    <td id="total-volume" class="px-3 py-3 text-right text-sm text-blue-700">0.000 fm</td>
+                                    <!-- Zellen für Gesamtpreis Netto und Brutto wurden HIER entfernt -->
+                                    <td class="px-3 py-3"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <!-- Buttons für Archivierung und PDF -->
+                    <div class="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
+                        <div class="flex space-x-3 w-full sm:w-auto">
+                            <button id="pdf-save-button" onclick="window.generatePDF()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition duration-300 shadow-md">
+                                Gutschrift als PDF
+                            </button>
+                            <!-- Der "Liste archivieren"-Button, der window.confirmArchive() aufruft. -->
+                            <button id="archive-table-button" onclick="window.confirmArchive()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-blue-700 bg-blue-100 rounded-xl hover:bg-blue-200 transition duration-300">
+                                Liste archivieren
+                            </button>
+                        </div>
+                        <!-- Liste leeren (als Alternative zur Archivierung) -->
+                        <button id="clear-table-button" onclick="window.confirmClear()" class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-300 border border-gray-200">
+                            Liste leeren (Verlust!)
+                        </button>
+                    </div>
+                </div>
+
+                
+            </div>
+        </main>
+
+        <!-- Fußzeile -->
+        <footer class="bg-gray-800 text-white p-6 mt-auto">
+            <div class="container mx-auto text-center text-sm">
+                <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
+            </div>
+        </footer>
+        
+    </div> <!-- Ende app-container -->
     
     <!-- Benutzerdefiniertes Bestätigungs-Modal (ersetzt prompt/confirm) -->
     <div id="confirmation-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300">
@@ -810,6 +842,50 @@
 
 
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. AUTHENTIFIZIERUNGS-LOGIK ---
+            const loginForm = document.getElementById('login-form');
+            const errorMessage = document.getElementById('error-message');
+            const loginScreen = document.getElementById('login-screen');
+            const appContainer = document.getElementById('app-container');
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const usernameInput = document.getElementById('username').value;
+                    const passwordInput = document.getElementById('password').value;
+
+                    // Die festen Anmeldedaten
+                    const correctUsername = 'admin';
+                    const correctPassword = 'admin';
+
+                    if (usernameInput === correctUsername && passwordInput === correctPassword) {
+                        // Bei Erfolg: Anmeldebildschirm ausblenden und App-Inhalt anzeigen
+                        errorMessage.classList.add('hidden');
+                        
+                        // Optischer Übergang
+                        loginScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loginScreen.classList.add('hidden');
+                            appContainer.classList.remove('hidden');
+                            appContainer.style.opacity = '1';
+                            
+                            // Wichtig: Fokus auf das erste Eingabefeld der App setzen, sobald sie sichtbar ist
+                            document.getElementById('kunde').focus();
+                        }, 500); 
+
+                    } else {
+                        // Bei Fehler: Fehlermeldung anzeigen und Passwortfeld leeren
+                        errorMessage.classList.remove('hidden');
+                        document.getElementById('password').value = '';
+                    }
+                });
+                
+                // Setzen Sie den anfänglichen Fokus auf das Benutzernamenfeld
+                document.getElementById('username').focus();
+            }
+
+            // --- 2. BESTEHENDE APP-LOGIK ---
             const laengeInput = document.getElementById('laenge');
             const durchmesserInput = document.getElementById('durchmesser');
             const holzartInput = document.getElementById('holzart');
@@ -951,9 +1027,6 @@
             // Initialer Aufruf
             renderTable();
             updatePriceDisplay(); // Setzt den initialen Preis auf 0.00 €
-            
-            // Setzt den anfänglichen Fokus
-            document.getElementById('kunde').focus();
         });
     </script>
 </body>
