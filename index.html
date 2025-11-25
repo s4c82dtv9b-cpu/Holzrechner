@@ -481,10 +481,10 @@
             setTimeout(() => feedback.classList.add('hidden'), 3000);
         }
 
-        // --- PDF Generierung ---
+        // --- PDF Generierung (MODERNISIERT) ---
 
         /**
-         * Erzeugt eine PDF-Datei (Gutschrift) mit Zusammenfassung und Stammliste.
+         * Erzeugt eine PDF-Datei (Gutschrift) mit Zusammenfassung und Stammliste im modernen Design.
          */
         window.generatePDF = function() {
             // Überprüft, ob Einträge vorhanden sind
@@ -507,29 +507,53 @@
                 return;
             }
             
-            // Initialisiert jsPDF
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            let y = 15;
             const margin = 15;
-            
-            // --- 1. FIRMENNAME ---
-            doc.setFontSize(24);
-            doc.text("Sägewerk Mülleder", margin, y);
-            y += 5;
+            let y = margin;
+            const today = new Date().toLocaleDateString('de-DE');
+            const mainCustomer = woodEntries[0].kunde || "Unbekannter Kunde"; // Hauptkunde
 
-            // --- 2. Titel & Datum ---
+            // --- 1. HEADER / BRANDING ---
+            
+            // Hintergrund für den Header (Lichtes Indigo)
+            doc.setFillColor(238, 242, 255); // Ähnlich wie Tailwind Indigo-100
+            doc.rect(0, 0, doc.internal.pageSize.width, 30, 'F');
+            
+            // Firmenname (Sägewerk Mülleder)
+            doc.setFontSize(24);
+            doc.setTextColor(55, 65, 81); // Dunkelgrau
+            doc.text("Sägewerk Mülleder", margin, 20);
+            
+            y = 40; // Startpunkt nach dem Header
+
+            // --- 2. DOKUMENTINFORMATIONEN ---
+            
             doc.setFontSize(18);
+            doc.setTextColor(29, 78, 216); // Tailwind Indigo-600
             doc.text("Gutschrift", margin, y);
-            y += 10;
-            
+            y += 8;
+
             doc.setFontSize(10);
-            doc.text(`Erstellt am: ${new Date().toLocaleDateString('de-DE')} | Gesamte Stämme: ${woodEntries.length}`, margin, y);
-            y += 10;
+            doc.setTextColor(107, 114, 128); // Standardgrau
+            doc.text(`Datum: ${today}`, doc.internal.pageSize.width - margin, y, { align: 'right' });
             
-            // --- 3. Klassifizierungs-Zusammenfassung ---
-            doc.setFontSize(16);
-            doc.text("Volumen-Zusammenfassung nach Klassifizierung", margin, y);
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0); // Schwarz
+            doc.text(`Für Kunde: ${mainCustomer}`, margin, y);
+            y += 12; 
+
+            // Trennlinie
+            doc.setDrawColor(209, 213, 219); // Hellgrau
+            doc.setLineWidth(0.5);
+            doc.line(margin, y, doc.internal.pageSize.width - margin, y);
+            y += 8;
+            
+            // --- 3. VOLUMEN-ZUSAMMENFASSUNG ---
+            
+            doc.setFontSize(14);
+            doc.setTextColor(55, 65, 81); // Dunkelgrau
+            doc.text("1. Gesamtvolumen nach Klassifizierung", margin, y);
             y += 5;
 
             // Berechnet die Summe pro Klassifizierung
@@ -545,34 +569,33 @@
                     classification,
                     volume.toFixed(3) + ' fm'
                 ])
-                .sort((a, b) => a[0].localeCompare(b[0])); // Sortiert alphabetisch nach Klassifizierung
+                .sort((a, b) => a[0].localeCompare(b[0])); 
 
-            // Gesamtvolumen berechnen
-            const totalVolume = summaryTableData.reduce((sum, row) => sum + parseFloat(row[1]), 0);
+            const totalVolume = woodEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
 
             doc.autoTable({
                 startY: y,
-                head: [['Klassifizierung', 'Gesamtvolumen (fm)']],
+                head: [['Klassifizierung', 'Volumen']],
                 body: summaryTableData,
-                foot: [['Gesamt', totalVolume.toFixed(3) + ' fm']],
-                theme: 'striped',
-                styles: { fontSize: 10 },
-                headStyles: { fillColor: [50, 50, 80], halign: 'center' },
-                footStyles: { fillColor: [200, 200, 200], fontStyle: 'bold' },
-                columnStyles: { 1: { halign: 'right' } }
+                foot: [['Gesamtvolumen', totalVolume.toFixed(3) + ' fm']],
+                theme: 'grid', // Moderner, einfacher Look
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [156, 163, 175], textColor: [255, 255, 255], fontStyle: 'bold' }, // Tailwind Gray-400
+                footStyles: { fillColor: [209, 213, 219], fontStyle: 'bold', textColor: [0, 0, 0] }, // Tailwind Gray-300
+                columnStyles: { 1: { halign: 'right' } } // Volumen rechtsbündig
             });
 
             y = doc.autoTable.previous.finalY + 15;
 
-            // --- 4. Detaillierte Stammliste ---
-            doc.setFontSize(16);
-            doc.text("Detaillierte Stammliste", margin, y);
+            // --- 4. DETAILLIERTE STAMMLISTE ---
+            
+            doc.setFontSize(14);
+            doc.setTextColor(55, 65, 81);
+            doc.text("2. Detaillierte Stammliste", margin, y);
             y += 5;
             
-            // Bereitet die Daten für die Detailtabelle vor
             const detailTableHead = [
-                'ID', 
-                'Kunde', 
+                'Lfd. Nr.', 
                 'Holzart', 
                 'Qualität', 
                 'Länge (m)', 
@@ -581,9 +604,9 @@
                 'Festmeter (fm)'
             ];
             
+            // Filtere Kunde heraus, da er bereits im Header steht, außer für die lfd. Nr.
             const detailTableBody = woodEntries.map((entry, index) => [
-                index + 1, // Einfache lfd. ID für das PDF
-                entry.kunde,
+                index + 1, // Lfd. Nummer
                 entry.holzart,
                 entry.qualitaet,
                 entry.laenge.toFixed(2),
@@ -596,17 +619,19 @@
                 startY: y,
                 head: [detailTableHead],
                 body: detailTableBody,
-                theme: 'grid',
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [100, 100, 100] },
+                theme: 'striped', // Streifen für bessere Lesbarkeit
+                styles: { fontSize: 8, cellPadding: 2 },
+                headStyles: { fillColor: [55, 65, 81], textColor: [255, 255, 255] }, // Dunkelgrau wie im Footer
                 columnStyles: { 
-                    4: { halign: 'right' }, 
-                    5: { halign: 'right' }, 
-                    7: { halign: 'right' } 
+                    3: { halign: 'right' }, // Länge
+                    4: { halign: 'right' }, // Durchmesser
+                    6: { halign: 'right', fontStyle: 'bold' } // Festmeter
                 },
                 didDrawPage: (data) => {
+                    // Footer für Seitennummerierung
                     doc.setFontSize(8);
-                    doc.text("Seite " + doc.internal.getNumberOfPages(), data.settings.margin.left, doc.internal.pageSize.height - 5);
+                    doc.setTextColor(156, 163, 175);
+                    doc.text(`Sägewerk Mülleder - Seite ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - margin, doc.internal.pageSize.height - 5, { align: 'right' });
                 }
             });
 
