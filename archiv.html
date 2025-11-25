@@ -1,1 +1,265 @@
 
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archiv</title>
+    <!-- Einbindung von Tailwind CSS für Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay {
+            z-index: 50; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navigationsleiste -->
+    <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Logo oder Markenname -->
+            <a href="index.html" class="text-xl font-bold text-indigo-600">Ihr Unternehmen</a>
+            <!-- Navigationslinks mit ARCHIV (hervorgehoben) -->
+            <div class="flex space-x-4">
+                <a href="index.html" class="text-gray-600 hover:text-indigo-600 font-semibold transition duration-300">Dashboard</a>
+                <a href="archiv.html" class="text-indigo-600 hover:text-indigo-800 font-semibold transition duration-300 border-b-2 border-indigo-600 pb-1">Archiv</a>
+                <a href="kunden.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Kunden</a>
+                <a href="preise.html" class="text-gray-600 hover:text-indigo-600 transition duration-300">Preise</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hauptinhalt (Archiv Ansicht) -->
+    <main class="flex-grow container mx-auto p-8">
+        <div class="w-full max-w-5xl mx-auto">
+            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center sm:text-left">
+                Archivierte Protokolle
+            </h1>
+            <p class="text-gray-600 mb-6">
+                Hier sehen Sie alle abgeschlossenen Protokolle, die vom Dashboard archiviert wurden. Jede Zeile stellt eine abgeschlossene Messsitzung dar.
+            </p>
+
+            <!-- SEKTION: Archiv-Tabelle -->
+            <div class="bg-white p-8 shadow-xl rounded-xl w-full mb-12 border-t-4 border-blue-500">
+                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Archivierungszeitpunkt</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Anzahl Stämme</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Gesamtvolumen (fm)</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aktion</th>
+                            </tr>
+                        </thead>
+                        <tbody id="archive-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Archiv-Einträge werden hier dynamisch eingefügt -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Archiv leeren Button -->
+                <div class="mt-8 flex justify-end">
+                    <button id="clear-archive-button" onclick="window.confirmClearArchive()" class="px-4 py-2 text-sm font-medium text-red-600 border border-red-200 bg-red-50 rounded-lg hover:bg-red-100 transition duration-300">
+                        Archiv komplett löschen
+                    </button>
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="feedback-message" class="mt-4 text-sm font-medium hidden"></div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Fußzeile -->
+    <footer class="bg-gray-800 text-white p-4 mt-auto">
+        <div class="container mx-auto text-center text-sm">
+            <p>&copy; <span id="year"></span> Ihr Unternehmen. Alle Rechte vorbehalten.</p>
+        </div>
+    </footer>
+    
+    <!-- Benutzerdefiniertes Bestätigungs-Modal (wie auf der Dashboard-Seite) -->
+    <div id="confirmation-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100">
+            <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-4">Aktion bestätigen</h3>
+            <p id="modal-message" class="text-gray-600 mb-6">Sind Sie sicher, dass Sie diesen Vorgang durchführen möchten?</p>
+            <div class="flex justify-end space-x-3">
+                <button onclick="window.hideConfirmation(false)" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
+                    Abbrechen
+                </button>
+                <button id="modal-confirm-button" onclick="window.hideConfirmation(true)" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150">
+                    Bestätigen
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JavaScript für die Archiv-Logik -->
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        let archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
+        
+        let actionOnConfirm = null; 
+        let actionParam = null;
+        
+        const feedback = document.getElementById('feedback-message');
+
+        // --- MODAL FUNKTIONEN ---
+
+        window.showConfirmation = function(title, message, onConfirmAction, param = null, confirmText = 'Bestätigen') {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('modal-confirm-button').textContent = confirmText;
+            document.getElementById('confirmation-modal').classList.remove('hidden');
+            actionOnConfirm = onConfirmAction;
+            actionParam = param;
+        }
+        
+        window.hideConfirmation = function(confirmed) {
+            document.getElementById('confirmation-modal').classList.add('hidden');
+            if (confirmed && actionOnConfirm) {
+                actionOnConfirm(actionParam);
+            }
+            actionOnConfirm = null;
+            actionParam = null;
+        }
+
+        // --- RENDER FUNKTION ---
+        function renderArchiveTable() {
+            const tbody = document.getElementById('archive-table-body');
+            tbody.innerHTML = '';
+
+            if (archivedEntries.length === 0) {
+                 const row = tbody.insertRow();
+                 row.innerHTML = `<td colspan="4" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic">Das Archiv ist leer.</td>`;
+                 return;
+            }
+
+            archivedEntries.forEach((session, index) => {
+                const row = tbody.insertRow();
+                row.className = 'hover:bg-gray-50 transition duration-100';
+
+                // Zeitstempel
+                row.insertCell().textContent = session.timestamp;
+                
+                // Anzahl Stämme (rechtsbündig)
+                const countCell = row.insertCell();
+                countCell.textContent = session.count;
+                countCell.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium';
+                
+                // Gesamtvolumen (rechtsbündig, hervorgehoben)
+                const volumeCell = row.insertCell();
+                volumeCell.textContent = session.totalVolume + ' fm';
+                volumeCell.className = 'px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-700 text-right';
+
+                // Aktion (Löschen der einzelnen Sitzung - optional)
+                const actionsCell = row.insertCell();
+                actionsCell.className = 'px-6 py-4 whitespace-nowrap text-center';
+                actionsCell.innerHTML = `
+                    <button onclick="window.showSessionDetails(${index})" class="text-blue-600 hover:text-blue-800 text-sm font-medium mr-3">Details anzeigen</button>
+                    <button onclick="window.confirmDeleteSession(${session.id})" class="text-red-600 hover:text-red-800 text-sm font-medium">Löschen</button>
+                `;
+            });
+        }
+        
+        // --- DETAILS ANZEIGEN (Temporär als einfacher Alert) ---
+        window.showSessionDetails = function(index) {
+            const session = archivedEntries[index];
+            if (!session) return;
+            
+            let detailText = `Protokoll vom ${session.timestamp} (${session.count} Stämme | ${session.totalVolume} fm):\n\n`;
+            
+            // Beschränke die Anzeige auf z.B. 10 Einträge, um den Browser nicht zu überlasten
+            const entriesToShow = session.entries.slice(0, 10);
+            
+            entriesToShow.forEach(entry => {
+                detailText += `${entry.kunde}, ${entry.holzart} (${entry.classification}): ${entry.laenge.toFixed(2)}m x ${entry.durchmesser.toFixed(1)}cm -> ${entry.festmeter.toFixed(3)} fm\n`;
+            });
+            
+            if (session.entries.length > 10) {
+                 detailText += `\n... und ${session.entries.length - 10} weitere Stämme.`;
+            }
+
+            // Benutzt das Modal, um die Details zu zeigen (kein nativem Alert)
+            window.showConfirmation(
+                'Sitzungsdetails', 
+                detailText, 
+                null, 
+                null,
+                'Schließen'
+            );
+            document.getElementById('modal-confirm-button').classList.remove('bg-red-600', 'hover:bg-red-700');
+            document.getElementById('modal-confirm-button').classList.add('bg-gray-600', 'hover:bg-gray-700');
+        }
+
+
+        // --- LÖSCHEN EINER EINZELNEN SITZUNG ---
+        window.confirmDeleteSession = function(id) {
+            window.showConfirmation(
+                'Archiv-Sitzung löschen', 
+                'Sind Sie sicher, dass Sie dieses Protokoll unwiderruflich aus dem Archiv entfernen möchten?', 
+                window.deleteArchiveSession, 
+                id,
+                'Endgültig löschen'
+            );
+        }
+
+        window.deleteArchiveSession = function(id) {
+            archivedEntries = archivedEntries.filter(e => e.id !== id);
+            localStorage.setItem('archivedEntries', JSON.stringify(archivedEntries));
+            renderArchiveTable();
+            
+            feedback.textContent = 'Archiv-Sitzung erfolgreich gelöscht!';
+            feedback.className = 'mt-4 text-sm text-red-600 font-medium';
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+        
+        // --- ARCHIV KOMPLETT LEEREN ---
+
+        window.confirmClearArchive = function() {
+            if (archivedEntries.length === 0) {
+                feedback.textContent = 'Das Archiv ist bereits leer.';
+                feedback.className = 'mt-4 text-sm text-red-600 font-medium';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                return;
+            }
+            window.showConfirmation(
+                'Archiv komplett löschen', 
+                `Wollen Sie wirklich das gesamte Archiv unwiderruflich löschen? Es sind ${archivedEntries.length} Protokolle gespeichert.`, 
+                window.handleClearArchive, 
+                null,
+                'Ja, alles löschen'
+            );
+        }
+
+        /**
+         * Löscht das gesamte Archiv.
+         */
+        window.handleClearArchive = function() {
+            archivedEntries = [];
+            localStorage.removeItem('archivedEntries');
+            renderArchiveTable();
+            
+            feedback.textContent = 'Archiv erfolgreich geleert!';
+            feedback.className = 'mt-4 text-sm text-red-600 font-medium';
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            renderArchiveTable();
+        });
+    </script>
+</body>
+</html>
