@@ -60,12 +60,13 @@
                 <!-- ÜBERSCHRIFT WIE GEWÜNSCHT GEÄNDERT -->
                 <h2 class="text-3xl font-bold text-blue-700 mb-8">Holzrechner</h2>
                 
-                <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-5 gap-6 items-end">
+                <!-- Geänderte Grid-Struktur für 6 Spalten auf MD+ (5 Eingaben + 1 Ausgabe) -->
+                <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-6 gap-6 items-end">
                     
                     <!-- Verstecktes Feld zur Speicherung der ID bei Bearbeitung -->
                     <input type="hidden" id="editing-id" value="">
                     
-                    <!-- Feld: Kunde -->
+                    <!-- Feld: Kunde (2 Spalten auf Mobile, 1 auf MD+) -->
                     <div class="col-span-2 md:col-span-1">
                         <label for="kunde" class="block text-sm font-semibold text-gray-700">Kunde</label>
                         <input type="text" id="kunde" name="kunde" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="Name des Kunden">
@@ -105,16 +106,24 @@
                         <label for="durchmesser" class="block text-sm font-semibold text-gray-700">Mitteldurchmesser (cm)</label>
                         <input type="number" step="0.1" id="durchmesser" name="durchmesser" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 25.5">
                     </div>
-
-                    <!-- Button: Speichern -->
-                    <div class="col-span-2 md:col-span-5 flex justify-end mt-4">
+                    
+                    <!-- NEUES Feld: Preis Anzeige (Ausgabe) -->
+                    <div class="col-span-1">
+                        <label class="block text-sm font-semibold text-gray-700">Einzelpreis (€)</label>
+                        <div id="calculated-price" class="mt-1 block w-full rounded-lg shadow-sm p-3 border border-blue-200 bg-blue-50 text-blue-700 font-bold text-center">
+                            0.00 €
+                        </div>
+                    </div>
+                    
+                    <!-- Button: Speichern (volle Breite auf Mobile, 6 Spalten auf MD+) -->
+                    <div class="col-span-2 md:col-span-6 flex justify-end mt-4">
                         <button type="submit" id="save-button" class="w-full sm:w-auto px-10 py-3 text-base font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-md hover:shadow-lg">
                             Stamm speichern (oder Enter in Ø)
                         </button>
                     </div>
                     
                     <!-- Feedback Message -->
-                    <div id="feedback-message" class="col-span-2 md:col-span-5 text-sm font-semibold hidden pt-2"></div>
+                    <div id="feedback-message" class="col-span-2 md:col-span-6 text-sm font-semibold hidden pt-2"></div>
                 </form>
             </div>
             
@@ -133,6 +142,7 @@
                                 <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Ø (cm)</th>
                                 <th class="px-3 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Klassifizierung</th>
                                 <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Festmeter (fm)</th>
+                                <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Preis (€)</th> <!-- NEUE SPALTE -->
                                 <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
                             </tr>
                         </thead>
@@ -141,9 +151,11 @@
                         </tbody>
                         <tfoot>
                             <tr class="bg-blue-50 font-extrabold border-t-2 border-blue-200">
-                                <!-- Colspan auf 6 erhöht (Kunde, Holzart, Qualität, Länge, Ø, Klassifizierung) -->
+                                <!-- Colspan auf 7 erhöht (Kunde, Holzart, Qualität, Länge, Ø, Klassifizierung, Festmeter) -->
                                 <td colspan="6" class="px-3 py-3 text-right text-sm text-blue-800">Gesamtvolumen:</td>
                                 <td id="total-volume" class="px-3 py-3 text-right text-sm text-blue-700">0.000 fm</td>
+                                <!-- NEUE ZELLE: Gesamtpreis -->
+                                <td id="total-price" class="px-3 py-3 text-right text-sm text-blue-700">0.00 €</td>
                                 <td class="px-3 py-3"></td>
                             </tr>
                         </tfoot>
@@ -208,6 +220,41 @@
         let actionOnConfirm = null; 
         let actionParam = null;
 
+        // Statische Preisliste (Preis pro Festmeter (fm) in Euro)
+        // Die Struktur ist: HOLZART -> QUALITAET -> PREIS
+        const PREISLISTE = {
+            'Fichte': {
+                'A/B': 120.00,
+                'B-Braunkern': 100.00,
+                'CX': 70.00,
+                'Käferholz': 50.00
+            },
+            'Tanne': {
+                'A/B': 130.00,
+                'B-Braunkern': 110.00,
+                'CX': 75.00,
+                'Käferholz': 55.00
+            },
+            'Eiche': {
+                'A/B': 250.00,
+                'B-Braunkern': 200.00,
+                'CX': 150.00,
+                'Käferholz': 100.00 // Hypothetischer Wert
+            },
+            'Lärche': {
+                'A/B': 150.00,
+                'B-Braunkern': 130.00,
+                'CX': 90.00,
+                'Käferholz': 60.00
+            },
+            'Kiefer': {
+                'A/B': 110.00,
+                'B-Braunkern': 90.00,
+                'CX': 65.00,
+                'Käferholz': 45.00
+            }
+        };
+
 
         // Speichert das aktuelle Array in localStorage
         function saveEntries() {
@@ -221,6 +268,24 @@
             const volume = basalArea * length;
             return volume; 
         }
+
+        /**
+         * Ruft den Preis pro Festmeter basierend auf Holzart und Qualität ab.
+         */
+        function getPricePerFm(holzart, qualitaet) {
+            // Sucht den Preis in der statischen Preisliste
+            const price = PREISLISTE[holzart] ? PREISLISTE[holzart][qualitaet] : 0.00;
+            return price;
+        }
+
+        /**
+         * Berechnet den Gesamtpreis eines Stammes.
+         */
+        function calculateTotalPrice(festmeter, holzart, qualitaet) {
+            const pricePerFm = getPricePerFm(holzart, qualitaet);
+            return festmeter * pricePerFm;
+        }
+
 
         /**
          * Klassifiziert das Holz basierend auf dem Mitteldurchmesser in cm.
@@ -242,13 +307,15 @@
         function renderTable() {
             const tbody = document.getElementById('wood-table-body');
             const totalVolumeElement = document.getElementById('total-volume');
+            const totalPriceElement = document.getElementById('total-price'); // NEU
             tbody.innerHTML = '';
             let totalVolume = 0;
+            let totalPrice = 0; // NEU
 
-            // Colspan ist 8 (8 Spalten insgesamt)
+            // Colspan ist 9 (9 Spalten insgesamt)
             if (woodEntries.length === 0) {
                  const row = tbody.insertRow();
-                 row.innerHTML = `<td colspan="8" class="px-3 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic bg-white">Noch keine Stämme erfasst.</td>`;
+                 row.innerHTML = `<td colspan="9" class="px-3 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic bg-white">Noch keine Stämme erfasst.</td>`;
             }
 
             woodEntries.forEach((entry, index) => {
@@ -280,6 +347,12 @@
                 const volumeCell = row.insertCell();
                 volumeCell.textContent = entry.festmeter.toFixed(3);
                 volumeCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-bold text-blue-700 bg-blue-100 text-right';
+                
+                // Preis (rechtsbündig und hervorgehoben) - NEU
+                const priceCell = row.insertCell();
+                priceCell.textContent = entry.price.toFixed(2) + ' €';
+                priceCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-bold text-green-700 bg-green-100 text-right';
+
 
                 // Aktionen
                 const actionsCell = row.insertCell();
@@ -291,9 +364,11 @@
 
 
                 totalVolume += entry.festmeter;
+                totalPrice += entry.price; // NEU
             });
 
             totalVolumeElement.textContent = `${totalVolume.toFixed(3)} fm`;
+            totalPriceElement.textContent = `${totalPrice.toFixed(2)} €`; // NEU
         }
         
         // --- MODAL FUNKTIONEN (ersetzt prompt/confirm) ---
@@ -357,7 +432,7 @@
             // Feedback anzeigen
             const feedback = document.getElementById('feedback-message');
             feedback.textContent = 'Stamm erfolgreich gelöscht!';
-            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
+            feedback.className = 'col-span-2 md:col-span-6 text-sm text-red-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 3000);
         }
@@ -369,14 +444,17 @@
             if (woodEntries.length === 0) {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Es gibt keine Stämme zum Archivieren.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
+                feedback.className = 'col-span-2 md:col-span-6 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
                 return;
             }
+            const totalVolume = woodEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
+            const totalPrice = woodEntries.reduce((sum, entry) => sum + entry.price, 0);
+            
             window.showConfirmation(
                 'Alle Stämme archivieren', 
-                `Wollen Sie wirklich alle ${woodEntries.length} erfassten Stämme archivieren und die Liste leeren? Die Daten sind danach im Archiv einsehbar.`, 
+                `Wollen Sie wirklich alle ${woodEntries.length} erfassten Stämme (Gesamtpreis: ${totalPrice.toFixed(2)} €) archivieren und die Liste leeren? Die Daten sind danach im Archiv einsehbar.`, 
                 window.handleArchive, 
                 null,
                 'Ja, archivieren'
@@ -392,14 +470,16 @@
             // Lade das Archiv (oder leeres Array)
             const archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
             
-            // Erstelle Zeitstempel und berechne Gesamtvolumen
+            // Erstelle Zeitstempel und berechne Gesamtvolumen & Preis
             const timestamp = new Date().toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'short' });
             const totalVolume = currentEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
+            const totalPrice = currentEntries.reduce((sum, entry) => sum + entry.price, 0); // NEU
 
             const archiveSession = {
                 id: Date.now(), // Eindeutige ID für die Archiv-Sitzung
                 timestamp: timestamp,
                 totalVolume: totalVolume.toFixed(3),
+                totalPrice: totalPrice.toFixed(2), // NEU
                 count: currentEntries.length,
                 entries: currentEntries // Speichere die tatsächlichen Daten
             };
@@ -415,8 +495,8 @@
             
             // Archivierungs-Erfolgsmeldung anzeigen
             const feedback = document.getElementById('feedback-message');
-            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalVolume} fm) und geleert!`;
-            feedback.className = 'col-span-2 md:col-span-5 text-sm text-blue-600 font-semibold';
+            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalPrice} €) und geleert!`;
+            feedback.className = 'col-span-2 md:col-span-6 text-sm text-blue-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 5000);
         }
@@ -427,7 +507,7 @@
              if (woodEntries.length === 0) {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Die Liste ist bereits leer.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
+                feedback.className = 'col-span-2 md:col-span-6 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
                 return;
@@ -452,7 +532,7 @@
             // Erfolgsmeldung anzeigen
             const feedback = document.getElementById('feedback-message');
             feedback.textContent = 'Liste erfolgreich geleert!';
-            feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
+            feedback.className = 'col-span-2 md:col-span-6 text-sm text-red-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 3000);
         }
@@ -467,7 +547,7 @@
             if (woodEntries.length === 0) {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Keine Einträge vorhanden, um eine Gutschrift zu erstellen.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
+                feedback.className = 'col-span-2 md:col-span-6 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 4000);
                 return;
@@ -477,7 +557,7 @@
             if (typeof window.jspdf === 'undefined' || typeof window.jspdf.AcroForm === 'undefined') {
                 const feedback = document.getElementById('feedback-message');
                 feedback.textContent = 'Fehler: PDF-Bibliotheken nicht geladen. Versuchen Sie es erneut.';
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
+                feedback.className = 'col-span-2 md:col-span-6 text-sm text-red-600 font-semibold';
                 feedback.classList.remove('hidden');
                 setTimeout(() => feedback.classList.add('hidden'), 4000);
                 return;
@@ -529,41 +609,49 @@
             doc.line(margin, y, doc.internal.pageSize.width - margin, y);
             y += 10;
             
-            // --- 3. VOLUMEN-ZUSAMMENFASSUNG ---
+            // --- 3. VOLUMEN- UND PREIS-ZUSAMMENFASSUNG ---
             
             doc.setFontSize(16);
             doc.setFont('Helvetica', 'Bold');
             doc.setTextColor(31, 41, 55);
-            doc.text("1. Gesamtvolumen nach Klassifizierung", margin, y);
+            doc.text("1. Gesamtübersicht nach Klassifizierung", margin, y);
             y += 5;
 
             // Berechnet die Summe pro Klassifizierung
             const summary = woodEntries.reduce((acc, entry) => {
                 const key = entry.classification;
-                acc[key] = (acc[key] || 0) + entry.festmeter;
+                acc[key] = {
+                    volume: (acc[key]?.volume || 0) + entry.festmeter,
+                    price: (acc[key]?.price || 0) + entry.price
+                };
                 return acc;
             }, {});
             
             // Bereitet die Daten für die Zusammenfassungstabelle vor und sortiert sie
             const summaryTableData = Object.entries(summary)
-                .map(([classification, volume]) => [
+                .map(([classification, data]) => [
                     classification,
-                    volume.toFixed(3) + ' fm'
+                    data.volume.toFixed(3) + ' fm',
+                    data.price.toFixed(2) + ' €' // Preis in Zusammenfassung
                 ])
                 .sort((a, b) => a[0].localeCompare(b[0])); 
 
             const totalVolume = woodEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
+            const totalPrice = woodEntries.reduce((sum, entry) => sum + entry.price, 0);
 
             doc.autoTable({
                 startY: y,
-                head: [['Klassifizierung', 'Volumen']],
+                head: [['Klassifizierung', 'Volumen', 'Gesamtpreis']],
                 body: summaryTableData,
-                foot: [['Gesamtvolumen', totalVolume.toFixed(3) + ' fm']],
+                foot: [['Gesamt', totalVolume.toFixed(3) + ' fm', totalPrice.toFixed(2) + ' €']],
                 theme: 'grid', 
                 styles: { fontSize: 11, cellPadding: 3, textColor: [55, 65, 81] },
                 headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' }, // Tailwind Indigo-600
                 footStyles: { fillColor: [224, 231, 255], fontStyle: 'bold', textColor: [0, 0, 0] }, // Tailwind Indigo-200
-                columnStyles: { 1: { halign: 'right' } } // Volumen rechtsbündig
+                columnStyles: { 
+                    1: { halign: 'right' }, // Volumen rechtsbündig
+                    2: { halign: 'right' }  // Preis rechtsbündig
+                } 
             });
 
             y = doc.autoTable.previous.finalY + 15;
@@ -583,7 +671,8 @@
                 'Länge (m)', 
                 'Ø (cm)', 
                 'Klass.', 
-                'Festmeter (fm)'
+                'Festmeter (fm)',
+                'Einzelpreis (€)' // NEUE SPALTE IM PDF
             ];
             
             // Filtere Kunde heraus, da er bereits im Header steht, außer für die lfd. Nr.
@@ -594,7 +683,8 @@
                 entry.laenge.toFixed(2),
                 entry.durchmesser.toFixed(1),
                 entry.classification,
-                entry.festmeter.toFixed(3)
+                entry.festmeter.toFixed(3),
+                entry.price.toFixed(2) // NEUE SPALTE
             ]);
 
             doc.autoTable({
@@ -607,7 +697,8 @@
                 columnStyles: { 
                     3: { halign: 'right' }, // Länge
                     4: { halign: 'right' }, // Durchmesser
-                    6: { halign: 'right', fontStyle: 'bold' } // Festmeter
+                    6: { halign: 'right', fontStyle: 'bold' }, // Festmeter
+                    7: { halign: 'right', fontStyle: 'bold' } // Einzelpreis
                 },
                 didDrawPage: (data) => {
                     // Footer für Seitennummerierung
@@ -634,6 +725,10 @@
                 document.getElementById('qualitaet').value = entryToEdit.qualitaet; 
                 document.getElementById('laenge').value = entryToEdit.laenge;
                 document.getElementById('durchmesser').value = entryToEdit.durchmesser;
+
+                // Preis-Anzeige aktualisieren
+                const calculatedPrice = calculateTotalPrice(entryToEdit.festmeter, entryToEdit.holzart, entryToEdit.qualitaet);
+                document.getElementById('calculated-price').textContent = `${calculatedPrice.toFixed(2)} €`;
 
                 // ID des Eintrags speichern, um beim Speichern den richtigen Eintrag zu aktualisieren
                 document.getElementById('editing-id').value = id;
@@ -663,9 +758,38 @@
         document.addEventListener('DOMContentLoaded', () => {
             const laengeInput = document.getElementById('laenge');
             const durchmesserInput = document.getElementById('durchmesser');
+            const holzartInput = document.getElementById('holzart');
+            const qualitaetInput = document.getElementById('qualitaet');
             const form = document.getElementById('wood-entry-form');
             const feedback = document.getElementById('feedback-message');
             const editingIdInput = document.getElementById('editing-id');
+            const calculatedPriceDisplay = document.getElementById('calculated-price');
+
+            /**
+             * Berechnet Volumen und Preis und aktualisiert die Preisanzeige im Formular.
+             */
+            function updatePriceDisplay() {
+                const laenge = parseFloat(laengeInput.value);
+                const durchmesser = parseFloat(durchmesserInput.value);
+                const holzart = holzartInput.value;
+                const qualitaet = qualitaetInput.value;
+
+                if (isNaN(laenge) || laenge <= 0 || isNaN(durchmesser) || durchmesser <= 0) {
+                    calculatedPriceDisplay.textContent = '0.00 €';
+                    return;
+                }
+
+                const festmeter = calculateVolume(laenge, durchmesser);
+                const totalPrice = calculateTotalPrice(festmeter, holzart, qualitaet);
+                
+                calculatedPriceDisplay.textContent = `${totalPrice.toFixed(2)} €`;
+            }
+
+            // Event-Listener für Eingaben, um den Preis dynamisch zu aktualisieren
+            const inputFields = [laengeInput, durchmesserInput, holzartInput, qualitaetInput];
+            inputFields.forEach(input => {
+                input.addEventListener('input', updatePriceDisplay);
+            });
 
 
             // 1. Enter-Sprung von LÄNGE zu MITTELDURCHMESSER
@@ -690,12 +814,15 @@
                 
                 const laenge = parseFloat(laengeInput.value);
                 const durchmesser = parseFloat(durchmesserInput.value);
+                const holzart = holzartInput.value;
+                const qualitaet = qualitaetInput.value;
+
                 const isEditing = !!editingIdInput.value;
 
                 // Validierung
                 if (isNaN(laenge) || laenge <= 0 || isNaN(durchmesser) || durchmesser <= 0) {
                     feedback.textContent = 'Fehler: Länge/Durchmesser fehlen oder sind ungültig!';
-                    feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-semibold';
+                    feedback.className = 'col-span-2 md:col-span-6 text-sm text-red-600 font-semibold';
                     feedback.classList.remove('hidden');
                     setTimeout(() => feedback.classList.add('hidden'), 4000);
                     
@@ -707,15 +834,17 @@
 
                 const festmeter = calculateVolume(laenge, durchmesser);
                 const classification = getClassification(durchmesser); // KLASSIFIZIERUNG
+                const price = calculateTotalPrice(festmeter, holzart, qualitaet); // PREISBERECHNUNG
 
                 const newEntry = {
                     kunde: document.getElementById('kunde').value || 'Unbekannt',
-                    holzart: document.getElementById('holzart').value,
-                    qualitaet: document.getElementById('qualitaet').value,
+                    holzart: holzart,
+                    qualitaet: qualitaet,
                     laenge: laenge,
                     durchmesser: durchmesser,
                     festmeter: festmeter,
-                    classification: classification // KLASSIFIZIERUNG SPEICHERN
+                    classification: classification, // KLASSIFIZIERUNG SPEICHERN
+                    price: price // PREIS SPEICHERN
                 };
                 
                 let originalLaenge = laengeInput.value; // Speichert den Wert der Länge vor dem Reset
@@ -731,6 +860,7 @@
                     }
                     // Nach Bearbeitung Formular zurücksetzen, da es sich meist um einen einzelnen Korrekturvorgang handelt
                     resetFormForNewEntry(); 
+                    
                     // Setzt den Fokus nach der Bearbeitung auf das Kundenfeld, um die Eingabesequenz neu zu starten
                     document.getElementById('kunde').focus();
                 } else {
@@ -749,9 +879,10 @@
                 // Speichern, Tabelle neu rendern
                 saveEntries();
                 renderTable();
+                updatePriceDisplay(); // Preis-Anzeige für nächste Eingabe aktualisieren
 
                 // Feedback anzeigen
-                feedback.className = 'col-span-2 md:col-span-5 text-sm text-green-600 font-semibold';
+                feedback.className = 'col-span-2 md:col-span-6 text-sm text-green-600 font-semibold';
                 feedback.classList.remove('hidden');
                 
                 // Feedback nach 3 Sekunden ausblenden
@@ -760,6 +891,7 @@
             
             // Initialer Aufruf
             renderTable();
+            updatePriceDisplay(); // Setzt den initialen Preis auf 0.00 €
             
             // Setzt den anfänglichen Fokus
             document.getElementById('kunde').focus();
