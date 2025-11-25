@@ -469,7 +469,7 @@
         }
 
 
-        // --- ARCHIVIERUNGS-Logik mit Modal (HIER IST DER FIX WICHTIG) ---
+        // --- ARCHIVIERUNGS-Logik mit Modal ---
 
         window.confirmArchive = function() {
             if (woodEntries.length === 0) {
@@ -520,8 +520,8 @@
             
             // Füge die neue Sitzung vorne hinzu
             archivedEntries.unshift(archiveSession); 
-            localStorage.setItem('archivedEntries', JSON.stringify(archivedEntries)); // WICHTIG: Speichert das Archiv
-            
+            localStorage.setItem('archivedEntries', JSON.stringify(archivedEntries));
+
             // Leere die aktuelle Liste und speichere
             woodEntries = [];
             saveEntries();
@@ -529,7 +529,7 @@
             
             // Archivierungs-Erfolgsmeldung anzeigen
             const feedback = document.getElementById('feedback-message');
-            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalBruttoPrice} € Brutto) und geleert! Gehen Sie jetzt zum Archiv-Tab.`;
+            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalBruttoPrice} € Brutto) und geleert!`;
             feedback.className = 'col-span-2 md:col-span-7 text-sm text-blue-600 font-semibold';
             feedback.classList.remove('hidden');
             setTimeout(() => feedback.classList.add('hidden'), 5000);
