@@ -35,7 +35,7 @@
     <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
         <div class="container mx-auto flex justify-between items-center">
             <!-- Logo oder Markenname -->
-            <a href="index.html" class="text-xl font-bold text-indigo-600">Ihr Unternehmen</a>
+            <a href="index.html" class="text-xl font-bold text-indigo-600">Sägewerk Mülleder</a>
             <!-- Navigationslinks mit ARCHIV -->
             <div class="flex space-x-4">
                 <a href="index.html" class="text-indigo-600 font-semibold hover:text-indigo-800 transition duration-300 border-b-2 border-indigo-600 pb-1">Dashboard</a>
@@ -49,8 +49,9 @@
     <!-- Hauptinhalt (Dashboard Ansicht) -->
     <main class="flex-grow container mx-auto p-8">
         <div class="w-full max-w-5xl mx-auto">
-            <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center sm:text-left">
-                Willkommen im Haupt-Dashboard
+            <!-- TITEL WIE GEWÜNSCHT GEÄNDERT UND GRÜN MARKIERT -->
+            <h1 class="text-4xl font-extrabold text-green-700 mb-8 text-center sm:text-left">
+                Holzrechner Sägewerk Mülleder
             </h1>
 
             <!-- SEKTION: Schnelle Datenerfassung für Holzstämme -->
@@ -209,7 +210,7 @@
     <footer class="bg-gray-800 text-white p-4 mt-auto">
         <div class="container mx-auto text-center text-sm">
             <!-- Das Jahr wird dynamisch eingefügt -->
-            <p>&copy; <span id="year"></span> Ihr Unternehmen. Alle Rechte vorbehalten.</p>
+            <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
         </div>
     </footer>
     
@@ -512,8 +513,13 @@
             let y = 15;
             const margin = 15;
             
-            // --- 1. Titel & Datum ---
+            // --- 1. FIRMENNAME ---
             doc.setFontSize(24);
+            doc.text("Sägewerk Mülleder", margin, y);
+            y += 5;
+
+            // --- 2. Titel & Datum ---
+            doc.setFontSize(18);
             doc.text("Gutschrift", margin, y);
             y += 10;
             
@@ -521,7 +527,7 @@
             doc.text(`Erstellt am: ${new Date().toLocaleDateString('de-DE')} | Gesamte Stämme: ${woodEntries.length}`, margin, y);
             y += 10;
             
-            // --- 2. Klassifizierungs-Zusammenfassung ---
+            // --- 3. Klassifizierungs-Zusammenfassung ---
             doc.setFontSize(16);
             doc.text("Volumen-Zusammenfassung nach Klassifizierung", margin, y);
             y += 5;
@@ -558,7 +564,7 @@
 
             y = doc.autoTable.previous.finalY + 15;
 
-            // --- 3. Detaillierte Stammliste ---
+            // --- 4. Detaillierte Stammliste ---
             doc.setFontSize(16);
             doc.text("Detaillierte Stammliste", margin, y);
             y += 5;
@@ -605,7 +611,7 @@
             });
 
             // Speichern der PDF
-            doc.save(`Gutschrift_Holzvermessung_${new Date().toISOString().slice(0, 10)}.pdf`);
+            doc.save(`Gutschrift_Sägewerk_Mülleder_${new Date().toISOString().slice(0, 10)}.pdf`);
         }
 
         /**
@@ -639,9 +645,8 @@
         function resetFormForNewEntry() {
             document.getElementById('editing-id').value = '';
             
-            // Setzt nur Länge und Durchmesser zurück 
-            // WICHTIG: Hier wird nichts zurückgesetzt, da die Formularwerte beim Speichern 
-            // gemäß der neuen Logik direkt manipuliert werden.
+            // Hier wird nichts zurückgesetzt, da die Formularwerte beim Speichern 
+            // gemäß der Logik direkt manipuliert werden, wenn nicht im Bearbeitungsmodus.
             
             // Schaltfläche zurücksetzen
             saveButton.textContent = 'Stamm speichern (oder Enter in Mitteldurchmesser)';
@@ -729,7 +734,7 @@
                     woodEntries.push(newEntry);
                     feedback.textContent = 'Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!';
                     
-                    // NEUE LOGIK: Länge beibehalten und Durchmesser zurücksetzen
+                    // Logik: Länge beibehalten und Durchmesser zurücksetzen
                     durchmesserInput.value = ''; // Durchmesser löschen
                     laengeInput.value = originalLaenge; // Länge beibehalten
                     durchmesserInput.focus(); // Fokus auf Durchmesser setzen
@@ -746,10 +751,6 @@
                 
                 // Feedback nach 3 Sekunden ausblenden
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
-                
-                // Das Fokus-Management erfolgt nun in der if/else-Logik,
-                // um zwischen neuem Eintrag (fokus auf durchmesser) und
-                // bearbeiten (fokus auf kunde) zu unterscheiden.
             });
             
             // Initialer Aufruf
