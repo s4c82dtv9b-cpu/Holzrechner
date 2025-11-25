@@ -31,7 +31,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- NEU: Anmeldebildschirm (Standardmäßig sichtbar) -->
+    <!-- Anmeldebildschirm (Standardmäßig sichtbar, wird durch JS gesteuert) -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gray-50 fixed inset-0 z-50">
         <div class="w-full max-w-md bg-white p-8 shadow-2xl rounded-xl border border-gray-100 transition-opacity duration-500 ease-in-out">
             <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Zugriff erforderlich</h1>
@@ -39,13 +39,13 @@
             
             <form id="login-form">
                 <div class="mb-4">
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Benutzername </label>
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Benutzername (admin)</label>
                     <input type="text" id="username" name="username" required
                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
                            placeholder="Benutzername eingeben">
                 </div>
                 <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Passwort </label>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Passwort (admin)</label>
                     <input type="password" id="password" name="password" required
                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
                            placeholder="Passwort eingeben">
@@ -58,7 +58,7 @@
         </div>
     </div>
 
-    <!-- Hauptinhalts-Container (NEU: Startet versteckt) -->
+    <!-- Hauptinhalts-Container (Startet versteckt oder sichtbar) -->
     <div id="app-container" class="hidden opacity-0 min-h-screen flex flex-col w-full transition-opacity duration-500 ease-in-out">
 
         <!-- Navigationsleiste -->
@@ -66,12 +66,16 @@
             <div class="container mx-auto flex justify-between items-center max-w-7xl">
                 <!-- Logo oder Markenname -->
                 <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
-                <!-- Navigationslinks mit ARCHIV -->
-                <div class="flex space-x-6">
+                <!-- Navigationslinks mit ARCHIV und LOGOUT -->
+                <div class="flex space-x-6 items-center">
                     <a href="index.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Dashboard</a>
                     <a href="archiv.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Archiv</a>
                     <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
                     <a href="preise.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Preise</a>
+                    <!-- NEU: Logout Button -->
+                    <button onclick="window.logout()" class="text-red-600 hover:text-red-800 font-medium transition duration-300 ml-4 py-1 px-3 border border-red-200 rounded-lg">
+                        Logout
+                    </button>
                 </div>
             </div>
         </nav>
@@ -180,7 +184,6 @@
                                     <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Ø (cm)</th>
                                     <th class="px-3 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Klassifizierung</th>
                                     <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Festmeter (fm)</th>
-                                    <!-- Spalten für Preis Netto und Brutto wurden HIER entfernt -->
                                     <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
                                 </tr>
                             </thead>
@@ -192,7 +195,6 @@
                                 <tr class="bg-blue-50 font-extrabold border-t-2 border-blue-200">
                                     <td colspan="6" class="px-3 py-3 text-right text-sm text-blue-800">Gesamtvolumen:</td>
                                     <td id="total-volume" class="px-3 py-3 text-right text-sm text-blue-700">0.000 fm</td>
-                                    <!-- Zellen für Gesamtpreis Netto und Brutto wurden HIER entfernt -->
                                     <td class="px-3 py-3"></td>
                                 </tr>
                             </tfoot>
@@ -373,11 +375,8 @@
         function renderTable() {
             const tbody = document.getElementById('wood-table-body');
             const totalVolumeElement = document.getElementById('total-volume');
-            // Die Elemente für Netto/Brutto-Gesamtpreis werden nicht mehr benötigt, da sie aus der Tabelle entfernt wurden.
             tbody.innerHTML = '';
             let totalVolume = 0;
-            // let totalNettoPrice = 0; // Nicht mehr in Tabelle angezeigt
-            // let totalBruttoPrice = 0; // Nicht mehr in Tabelle angezeigt
 
             // Die Tabelle hat jetzt 8 Spalten (7 Daten + 1 Aktion)
             if (woodEntries.length === 0) {
@@ -415,8 +414,6 @@
                 volumeCell.textContent = entry.festmeter.toFixed(3);
                 volumeCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-bold text-blue-700 bg-blue-100 text-right';
                 
-                // Preis Netto und Brutto Zellen wurden HIER entfernt.
-
                 // Aktionen
                 const actionsCell = row.insertCell();
                 actionsCell.className = 'px-3 py-2 whitespace-nowrap text-right';
@@ -427,8 +424,6 @@
 
 
                 totalVolume += entry.festmeter;
-                // totalNettoPrice += entry.nettoPrice; 
-                // totalBruttoPrice += entry.bruttoPrice; 
             });
 
             totalVolumeElement.textContent = `${totalVolume.toFixed(3)} fm`;
@@ -547,6 +542,8 @@
             const totalVolume = currentEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
             const totalNettoPrice = currentEntries.reduce((sum, entry) => sum + entry.nettoPrice, 0);
             const totalBruttoPrice = currentEntries.reduce((sum, entry) => sum + entry.bruttoPrice, 0);
+            const totalMwstAmount = currentEntries.reduce((sum, entry) => sum + entry.mwstAmount, 0);
+
 
             const archiveSession = {
                 id: Date.now(), // Eindeutige ID für die Archiv-Sitzung
@@ -554,6 +551,7 @@
                 totalVolume: totalVolume.toFixed(3),
                 totalNettoPrice: totalNettoPrice.toFixed(2), 
                 totalBruttoPrice: totalBruttoPrice.toFixed(2), 
+                totalMwstAmount: totalMwstAmount.toFixed(2), 
                 count: currentEntries.length,
                 entries: currentEntries // Speichere die tatsächlichen Daten
             };
@@ -840,14 +838,57 @@
             saveButton.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
         }
 
+        /**
+         * NEU: Logout-Funktion. Löscht den Anmelde-Flag und lädt die Seite neu.
+         */
+        window.logout = function() {
+            sessionStorage.removeItem('isLoggedIn');
+            window.location.reload(); 
+        }
+
+        /**
+         * Zeigt den Haupt-App-Container an und blendet den Login-Screen aus.
+         */
+        function showApp() {
+            const loginScreen = document.getElementById('login-screen');
+            const appContainer = document.getElementById('app-container');
+            
+            // Login-Screen ausblenden und Hauptinhalt einblenden
+            loginScreen.classList.add('hidden');
+            appContainer.classList.remove('hidden');
+            appContainer.style.opacity = '1';
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. AUTHENTIFIZIERUNGS-LOGIK ---
+            const loginScreen = document.getElementById('login-screen');
             const loginForm = document.getElementById('login-form');
             const errorMessage = document.getElementById('error-message');
-            const loginScreen = document.getElementById('login-screen');
-            const appContainer = document.getElementById('app-container');
+            
+            const laengeInput = document.getElementById('laenge');
+            const durchmesserInput = document.getElementById('durchmesser');
+            const holzartInput = document.getElementById('holzart');
+            const qualitaetInput = document.getElementById('qualitaet');
+            const form = document.getElementById('wood-entry-form');
+            const feedback = document.getElementById('feedback-message');
+            const editingIdInput = document.getElementById('editing-id');
+            const calculatedPriceNettoDisplay = document.getElementById('calculated-price-netto');
+            const calculatedPriceBruttoDisplay = document.getElementById('calculated-price-brutto');
+
+
+            // --- 1. SESSION-CHECK BEIM LADEN DER SEITE (FÜR ALLE SEITEN WICHTIG!) ---
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                showApp();
+                document.getElementById('kunde').focus(); // Fokus auf das erste Eingabefeld
+                renderTable(); // Tabelle rendern, falls Daten vorhanden
+                updatePriceDisplay(); // Preis-Anzeige aktualisieren
+            } else {
+                // Wenn nicht eingeloggt, Anmeldeschirm anzeigen und Fokus setzen
+                loginScreen.style.opacity = '1';
+                document.getElementById('username').focus();
+            }
+
+            // --- 2. AUTHENTIFIZIERUNGS-LOGIK ---
 
             if (loginForm) {
                 loginForm.addEventListener('submit', function(e) {
@@ -860,18 +901,17 @@
                     const correctPassword = 'admin';
 
                     if (usernameInput === correctUsername && passwordInput === correctPassword) {
-                        // Bei Erfolg: Anmeldebildschirm ausblenden und App-Inhalt anzeigen
+                        // Bei Erfolg: Flag setzen und App anzeigen
+                        sessionStorage.setItem('isLoggedIn', 'true');
                         errorMessage.classList.add('hidden');
                         
                         // Optischer Übergang
                         loginScreen.style.opacity = '0';
                         setTimeout(() => {
-                            loginScreen.classList.add('hidden');
-                            appContainer.classList.remove('hidden');
-                            appContainer.style.opacity = '1';
-                            
-                            // Wichtig: Fokus auf das erste Eingabefeld der App setzen, sobald sie sichtbar ist
+                            showApp();
                             document.getElementById('kunde').focus();
+                            renderTable();
+                            updatePriceDisplay();
                         }, 500); 
 
                     } else {
@@ -880,22 +920,10 @@
                         document.getElementById('password').value = '';
                     }
                 });
-                
-                // Setzen Sie den anfänglichen Fokus auf das Benutzernamenfeld
-                document.getElementById('username').focus();
             }
 
-            // --- 2. BESTEHENDE APP-LOGIK ---
-            const laengeInput = document.getElementById('laenge');
-            const durchmesserInput = document.getElementById('durchmesser');
-            const holzartInput = document.getElementById('holzart');
-            const qualitaetInput = document.getElementById('qualitaet');
-            const form = document.getElementById('wood-entry-form');
-            const feedback = document.getElementById('feedback-message');
-            const editingIdInput = document.getElementById('editing-id');
-            const calculatedPriceNettoDisplay = document.getElementById('calculated-price-netto');
-            const calculatedPriceBruttoDisplay = document.getElementById('calculated-price-brutto');
-
+            // --- 3. BESTEHENDE APP-LOGIK (NUR AUSFÜHREN, WENN EINGELOGGT) ---
+            
             /**
              * Berechnet Volumen und Preis (Netto/Brutto) und aktualisiert die Preisanzeige im Formular.
              */
@@ -921,12 +949,12 @@
             // Event-Listener für Eingaben, um den Preis dynamisch zu aktualisieren
             const inputFields = [laengeInput, durchmesserInput, holzartInput, qualitaetInput];
             inputFields.forEach(input => {
-                input.addEventListener('input', updatePriceDisplay);
+                if (input) input.addEventListener('input', updatePriceDisplay);
             });
 
 
             // 1. Enter-Sprung von LÄNGE zu MITTELDURCHMESSER
-            laengeInput.addEventListener('keydown', (e) => {
+            if (laengeInput) laengeInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && laengeInput.value) {
                     e.preventDefault(); 
                     durchmesserInput.focus();
@@ -934,7 +962,7 @@
             });
 
             // 2. Enter-Sprung von MITTELDURCHMESSER löst SUBMIT aus und springt zurück
-            durchmesserInput.addEventListener('keydown', (e) => {
+            if (durchmesserInput) durchmesserInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault(); 
                     form.dispatchEvent(new Event('submit', { cancelable: true })); 
@@ -942,7 +970,7 @@
             });
 
             // 3. Formular-Verarbeitung (Speicherung und Berechnung)
-            form.addEventListener('submit', (e) => {
+            if (form) form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
                 const laenge = parseFloat(laengeInput.value);
@@ -1023,10 +1051,6 @@
                 // Feedback nach 3 Sekunden ausblenden
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
             });
-            
-            // Initialer Aufruf
-            renderTable();
-            updatePriceDisplay(); // Setzt den initialen Preis auf 0.00 €
         });
     </script>
 </body>
