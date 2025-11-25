@@ -14,6 +14,10 @@
             display: flex;
             flex-direction: column;
         }
+        /* Definiert eine schmale Schriftart für die Tabelle, falls auf mobilen Geräten benötigt */
+        .table-font {
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -39,11 +43,14 @@
                 Willkommen im Haupt-Dashboard
             </h1>
 
-            <!-- NEUE Sektion: Schnelle Datenerfassung für Holzstämme -->
-            <div class="bg-white p-8 shadow-xl rounded-xl w-full mb-12 border-t-4 border-indigo-500">
+            <!-- SEKTION: Schnelle Datenerfassung für Holzstämme -->
+            <div class="bg-white p-8 shadow-xl rounded-xl w-full mb-8 border-t-4 border-indigo-500">
                 <h2 class="text-3xl font-bold text-indigo-700 mb-6">Schnelle Stammdaten erfassen</h2>
                 
                 <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-5 gap-6 items-end">
+                    
+                    <!-- Verstecktes Feld zur Speicherung der ID bei Bearbeitung -->
+                    <input type="hidden" id="editing-id" value="">
                     
                     <!-- Feld: Kunde -->
                     <div class="col-span-2 md:col-span-1">
@@ -55,23 +62,22 @@
                     <div class="col-span-1">
                         <label for="holzart" class="block text-sm font-medium text-gray-700">Holzart</label>
                         <select id="holzart" name="holzart" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border bg-white">
-                            <option value="fichte">Fichte</option>
-                            <option value="tanne">Tanne</option>
-                            <option value="eiche">Eiche</option>
-                            <option value="lärche">Lärche</option>
-                            <option value="kiefer">Kiefer</option>
+                            <option value="Fichte">Fichte</option>
+                            <option value="Tanne">Tanne</option>
+                            <option value="Eiche">Eiche</option>
+                            <option value="Lärche">Lärche</option>
+                            <option value="Kiefer">Kiefer</option>
                         </select>
                     </div>
                     
-                    <!-- Feld: Holzklasse -->
+                    <!-- Feld: Qualität (ehemals Holzklasse) -->
                     <div class="col-span-1">
-                        <label for="holzklasse" class="block text-sm font-medium text-gray-700">Holzklasse</label>
-                        <select id="holzklasse" name="holzklasse" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border bg-white">
-                            <option value="1a">1a</option>
-                            <option value="1b">1b</option>
-                            <option value="b">b</option>
-                            <option value="cx">cx</option>
-                            <option value="käfer">Käfer</option>
+                        <label for="qualitaet" class="block text-sm font-medium text-gray-700">Qualität</label>
+                        <select id="qualitaet" name="qualitaet" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border bg-white">
+                            <option value="A/B">A/B</option>
+                            <option value="B-Braunkern">B (Braunkern)</option>
+                            <option value="CX">CX</option>
+                            <option value="Käferholz">Käferholz</option>
                         </select>
                     </div>
                     
@@ -87,18 +93,58 @@
                         <input type="number" step="0.1" id="durchmesser" name="durchmesser" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2.5 border" placeholder="z.B. 25.5">
                     </div>
 
-                    <!-- Button: Speichern -->
+                    <!-- Button: Speichern (wird hauptsächlich durch Enter ausgelöst) -->
                     <div class="col-span-2 md:col-span-5 flex justify-end">
-                        <button type="submit" class="w-full sm:w-auto px-8 py-2.5 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300">
-                            Stamm speichern
+                        <button type="submit" id="save-button" class="w-full sm:w-auto px-8 py-2.5 border border-transparent text-base font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300">
+                            Stamm speichern (oder Enter in Mitteldurchmesser)
                         </button>
                     </div>
                     
                     <!-- Feedback Message -->
-                    <div id="feedback-message" class="col-span-2 md:col-span-5 text-sm text-green-600 font-medium hidden">Eintrag erfolgreich gespeichert! (Details in der Konsole)</div>
+                    <div id="feedback-message" class="col-span-2 md:col-span-5 text-sm text-green-600 font-medium hidden">Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!</div>
                 </form>
             </div>
             
+            <!-- NEUE SEKTION: Eingegebene Stämme Tabelle -->
+            <div class="bg-white p-8 shadow-xl rounded-xl w-full mb-12">
+                <h2 class="text-3xl font-bold text-gray-700 mb-6">Erfasste Stämme</h2>
+                
+                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200 table-font">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kunde</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Holzart</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qualität</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Länge (m)</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ø (cm)</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Klassifizierung</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Festmeter (fm)</th>
+                                <th class="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="wood-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Einträge werden hier dynamisch eingefügt -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-100 font-bold">
+                                <!-- Colspan auf 6 erhöht (Kunde, Holzart, Qualität, Länge, Ø, Klassifizierung) -->
+                                <td colspan="6" class="px-3 py-2 text-right text-sm text-gray-800">Gesamtvolumen:</td>
+                                <td id="total-volume" class="px-3 py-2 text-right text-sm text-indigo-700">0.000 fm</td>
+                                <td class="px-3 py-2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                
+                <!-- Leeren Button -->
+                <div class="mt-4 flex justify-end">
+                     <button id="clear-table-button" class="px-4 py-2 text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition duration-300">
+                        Liste löschen
+                    </button>
+                </div>
+            </div>
+
             <!-- Bestehende Dashboard Karten (Zugriff auf Kunden und Preise) -->
             <h2 class="text-2xl font-semibold text-gray-800 mb-6">Übersichten</h2>
 
@@ -148,67 +194,278 @@
         </div>
     </footer>
 
-    <!-- JavaScript für die Eingabelogik und das aktuelle Jahr -->
+    <!-- JavaScript für die Eingabelogik, Volumenberechnung und Tabelle -->
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Array zur Speicherung der Holzstämme (dient als temporäre Datenbank)
+        // Beim Laden wird versucht, Daten aus localStorage zu laden.
+        let woodEntries = JSON.parse(localStorage.getItem('woodEntries')) || [];
+        const saveButton = document.getElementById('save-button');
+
+
+        // Speichert das aktuelle Array in localStorage
+        function saveEntries() {
+            localStorage.setItem('woodEntries', JSON.stringify(woodEntries));
+        }
+
+        // Funktion zur Volumenberechnung (Huber-Formel / Zylindervolumen)
+        // D_mitte in cm, Länge in m. Ergebnis in Kubikmetern (Festmeter).
+        function calculateVolume(length, diameter) {
+            // Umrechnung des Durchmessers von cm in Meter (diameter / 100)
+            const diameterMeters = diameter / 100;
+            // Fläche des Mitteldurchmessers: (Pi / 4) * D^2
+            const basalArea = Math.PI / 4 * diameterMeters * diameterMeters;
+            // Volumen = Fläche * Länge
+            const volume = basalArea * length;
+            return volume; 
+        }
+
+        /**
+         * Klassifiziert das Holz basierend auf dem Mitteldurchmesser in cm.
+         * Regeln: 1b= 15-19cm, 2a= 20-24cm, 2b+=25cm aufwärts
+         * @param {number} diameter - Mitteldurchmesser in cm.
+         * @returns {string} Die entsprechende Klassifizierung.
+         */
+        function getClassification(diameter) {
+            if (diameter >= 25) {
+                return '2b+ (Starkholz)';
+            } else if (diameter >= 20) {
+                return '2a';
+            } else if (diameter >= 15) {
+                return '1b';
+            } else {
+                return 'UNKLAR (< 15 cm)';
+            }
+        }
+
+
+        // Funktion zur Aktualisierung der Tabelle und der Gesamtmenge
+        function renderTable() {
+            const tbody = document.getElementById('wood-table-body');
+            const totalVolumeElement = document.getElementById('total-volume');
+            tbody.innerHTML = '';
+            let totalVolume = 0;
+
+            // Colspan ist jetzt 8 (7 Spalten + 1 Aktionsspalte)
+            if (woodEntries.length === 0) {
+                 const row = tbody.insertRow();
+                 row.innerHTML = `<td colspan="8" class="px-3 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic">Noch keine Stämme erfasst.</td>`;
+            }
+
+            woodEntries.forEach(entry => {
+                const row = tbody.insertRow();
+                row.className = 'hover:bg-gray-50 transition duration-100';
+
+                // Füllt die Zeilen mit Daten
+                row.insertCell().textContent = entry.kunde;
+                row.insertCell().textContent = entry.holzart;
+                row.insertCell().textContent = entry.qualitaet; 
+
+                // Länge (rechtsbündig)
+                const lengthCell = row.insertCell();
+                lengthCell.textContent = parseFloat(entry.laenge).toFixed(2);
+                lengthCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-right';
+                
+                // Mitteldurchmesser (rechtsbündig)
+                const diameterCell = row.insertCell();
+                diameterCell.textContent = parseFloat(entry.durchmesser).toFixed(1);
+                diameterCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-right';
+                
+                // NEUE SPALTE: Klassifizierung (zentriert)
+                const classCell = row.insertCell();
+                classCell.textContent = entry.classification;
+                classCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center font-semibold';
+
+
+                // Festmeter (rechtsbündig und hervorgehoben)
+                const volumeCell = row.insertCell();
+                volumeCell.textContent = entry.festmeter.toFixed(3);
+                volumeCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-medium text-indigo-700 bg-indigo-50 text-right';
+
+                // Aktionen
+                const actionsCell = row.insertCell();
+                actionsCell.className = 'px-3 py-2 whitespace-nowrap text-right';
+                actionsCell.innerHTML = `
+                    <button onclick="window.editEntry(${entry.id})" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium mr-2">Ändern</button>
+                    <button onclick="window.deleteEntry(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium">Löschen</button>
+                `;
+
+
+                totalVolume += entry.festmeter;
+            });
+
+            totalVolumeElement.textContent = `${totalVolume.toFixed(3)} fm`;
+        }
+
+        /**
+         * Löscht einen Eintrag anhand seiner ID und speichert die Liste.
+         * @param {number} id - Eindeutige ID des zu löschenden Eintrags.
+         */
+        window.deleteEntry = function(id) {
+            // Wichtig: window.confirm() wird durch die Laufzeitumgebung abgebildet
+            if (confirm('Sind Sie sicher, diesen Eintrag zu löschen?')) {
+                woodEntries = woodEntries.filter(e => e.id !== id);
+                saveEntries();
+                renderTable();
+            }
+        }
+
+        /**
+         * Lädt die Daten eines Eintrags in das Formular zum Bearbeiten.
+         * @param {number} id - Eindeutige ID des zu bearbeitenden Eintrags.
+         */
+        window.editEntry = function(id) {
+            const entryToEdit = woodEntries.find(e => e.id === id);
+            if (entryToEdit) {
+                // Formularfelder füllen
+                document.getElementById('kunde').value = entryToEdit.kunde;
+                document.getElementById('holzart').value = entryToEdit.holzart;
+                document.getElementById('qualitaet').value = entryToEdit.qualitaet; 
+                document.getElementById('laenge').value = entryToEdit.laenge;
+                document.getElementById('durchmesser').value = entryToEdit.durchmesser;
+
+                // ID des Eintrags speichern, um beim Speichern den richtigen Eintrag zu aktualisieren
+                document.getElementById('editing-id').value = id;
+
+                // Schaltfläche auf Bearbeitungsmodus umstellen
+                saveButton.textContent = 'Änderungen speichern';
+                saveButton.classList.remove('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
+                saveButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
+
+                document.getElementById('kunde').focus();
+            }
+        }
+
+        /**
+         * Setzt das Formular in den Standardmodus (Neuer Eintrag).
+         */
+        function resetFormForNewEntry() {
+            document.getElementById('editing-id').value = '';
+            
+            // Setzt nur Länge und Durchmesser zurück 
+            document.getElementById('laenge').value = '';
+            document.getElementById('durchmesser').value = '';
+            
+            // Schaltfläche zurücksetzen
+            saveButton.textContent = 'Stamm speichern (oder Enter in Mitteldurchmesser)';
+            saveButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'focus:ring-indigo-500');
+            saveButton.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
+        }
+
 
         document.addEventListener('DOMContentLoaded', () => {
             const laengeInput = document.getElementById('laenge');
             const durchmesserInput = document.getElementById('durchmesser');
             const form = document.getElementById('wood-entry-form');
             const feedback = document.getElementById('feedback-message');
+            const clearButton = document.getElementById('clear-table-button');
+            const editingIdInput = document.getElementById('editing-id');
+
 
             // 1. Enter-Sprung von LÄNGE zu MITTELDURCHMESSER
             laengeInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && laengeInput.value) {
                     e.preventDefault(); 
                     durchmesserInput.focus();
                 }
             });
 
-            // 2. Enter-Sprung von MITTELDURCHMESSER zurück zu LÄNGE
+            // 2. Enter-Sprung von MITTELDURCHMESSER löst SUBMIT aus und springt zurück
             durchmesserInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault(); 
-                    
-                    // Der Fokus springt zurück zur Länge
-                    laengeInput.focus();
-                    
-                    // Optional: Alle Werte in Länge markieren, damit der Benutzer sofort den neuen Wert eingeben kann
-                    laengeInput.select();
+                    form.dispatchEvent(new Event('submit', { cancelable: true })); 
                 }
             });
 
-            // 3. Formular-Verarbeitung (Speicherung simulieren)
+            // 3. Formular-Verarbeitung (Speicherung und Berechnung)
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
                 
-                // Hier würden Sie normalerweise die Daten an eine Datenbank (z.B. Firestore) senden
-                const entry = {
-                    kunde: document.getElementById('kunde').value,
+                const laenge = parseFloat(laengeInput.value);
+                const durchmesser = parseFloat(durchmesserInput.value);
+                const isEditing = !!editingIdInput.value;
+
+                // Validierung: Prüfen, ob Länge und Durchmesser gültige Zahlen sind
+                if (isNaN(laenge) || laenge <= 0 || isNaN(durchmesser) || durchmesser <= 0) {
+                    console.error("Fehler: Länge und Mitteldurchmesser müssen gültige Zahlen größer als 0 sein.");
+                    feedback.textContent = 'Fehler: Länge/Durchmesser fehlen oder sind ungültig!';
+                    feedback.className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                    feedback.classList.remove('hidden');
+                    setTimeout(() => feedback.classList.add('hidden'), 4000);
+                    
+                    if (isNaN(laenge) || laenge <= 0) laengeInput.focus();
+                    else durchmesserInput.focus();
+                    
+                    return; 
+                }
+
+                const festmeter = calculateVolume(laenge, durchmesser);
+                const classification = getClassification(durchmesser); // NEUE KLASSIFIZIERUNG
+
+                const newEntry = {
+                    kunde: document.getElementById('kunde').value || 'Unbekannt',
                     holzart: document.getElementById('holzart').value,
-                    holzklasse: document.getElementById('holzklasse').value,
-                    laenge: laengeInput.value,
-                    durchmesser: durchmesserInput.value,
+                    qualitaet: document.getElementById('qualitaet').value,
+                    laenge: laenge,
+                    durchmesser: durchmesser,
+                    festmeter: festmeter,
+                    classification: classification // KLASSIFIZIERUNG SPEICHERN
                 };
 
-                // Ausgabe in der Konsole zur Überprüfung
-                console.log('Neuer Stamm-Eintrag:', entry);
+                if (isEditing) {
+                    // Bearbeiten: Bestehenden Eintrag aktualisieren
+                    const id = parseInt(editingIdInput.value);
+                    const index = woodEntries.findIndex(e => e.id === id);
+                    
+                    if (index !== -1) {
+                        woodEntries[index] = { ...newEntry, id: id };
+                        feedback.textContent = 'Eintrag erfolgreich aktualisiert!';
+                    }
+                    resetFormForNewEntry(); 
+                } else {
+                    // Neuer Eintrag: Hinzufügen mit neuer ID
+                    newEntry.id = Date.now(); 
+                    woodEntries.push(newEntry);
+                    feedback.textContent = 'Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!';
+                }
+
+
+                // Speichern, Tabelle neu rendern
+                saveEntries();
+                renderTable();
 
                 // Feedback anzeigen
+                feedback.className = 'col-span-2 md:col-span-5 text-sm text-green-600 font-medium';
                 feedback.classList.remove('hidden');
                 
-                // Nur Länge und Durchmesser leeren, damit Kunde, Holzart, Klasse für den nächsten Stamm gleich bleiben
-                laengeInput.value = '';
-                durchmesserInput.value = '';
-
                 // Feedback nach 3 Sekunden ausblenden
                 setTimeout(() => feedback.classList.add('hidden'), 3000);
                 
-                // Fokus auf Länge setzen, um die Eingabe fortzusetzen
+                // Fokus auf Länge setzen und Wert auswählen, um die Eingabe fortzusetzen
                 laengeInput.focus(); 
+                laengeInput.select();
+            });
+            
+            // Event-Listener für den "Liste löschen" Button
+            clearButton.addEventListener('click', () => {
+                if (woodEntries.length > 0 && confirm("Sind Sie sicher, dass Sie alle erfassten Stämme löschen möchten?")) {
+                    woodEntries = [];
+                    saveEntries();
+                    renderTable();
+                    
+                    document.getElementById('feedback-message').textContent = 'Liste erfolgreich gelöscht!';
+                    document.getElementById('feedback-message').className = 'col-span-2 md:col-span-5 text-sm text-red-600 font-medium';
+                    document.getElementById('feedback-message').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('feedback-message').classList.add('hidden'), 3000);
+                }
             });
 
+
+            // Initialer Aufruf, um die Tabelle beim Laden mit gespeicherten Daten zu befüllen
+            renderTable();
+            
             // Setzt den anfänglichen Fokus auf das Kunden-Feld für einen schnellen Start
             document.getElementById('kunde').focus();
         });
