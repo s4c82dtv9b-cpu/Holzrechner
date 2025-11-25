@@ -12,6 +12,13 @@
             display: flex;
             flex-direction: column;
         }
+        .edit-input {
+            width: 100%;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 0.375rem;
+            text-align: right;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -71,13 +78,20 @@
                 Aktuelle Preisliste (Brutto pro Festmeter)
             </h1>
 
-            <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-12 border-t-6 border-blue-600">
-                <p class="text-sm text-gray-500 mb-6">Hinweis: Alle Preise sind Bruttopreise (inkl. 13% MwSt.) pro Festmeter (fm).</p>
-                
-                <div id="price-list-container" class="space-y-6">
-                    <!-- Preislisten werden hier dynamisch eingefügt -->
-                </div>
-                
+            <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-4 border-t-4 border-primary-blue">
+                <p class="text-sm text-gray-500 mb-6">
+                    Hinweis: Alle Preise sind Bruttopreise (inkl. 13% MwSt.) pro Festmeter (fm). Preise können direkt bearbeitet und mit dem 'Speichern'-Button dauerhaft gesichert werden.
+                </p>
+                <button onclick="saveAllPrices()" 
+                        class="mb-6 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50">
+                    Alle Änderungen speichern
+                </button>
+                <p id="feedback-message" class="text-sm font-medium mb-4 hidden"></p>
+            </div>
+
+
+            <div id="price-list-container" class="space-y-8">
+                <!-- Preislisten werden hier dynamisch eingefügt -->
             </div>
             
         </main>
@@ -101,25 +115,20 @@
             const loginScreen = document.getElementById('login-screen');
             const appContainer = document.getElementById('app-container');
 
-            // Wenn der "isLoggedIn"-Flag nicht in der Session gesetzt ist...
             if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-                // Zeige den Login-Screen auf dieser Seite
                 if (loginScreen) {
                     loginScreen.classList.remove('hidden');
                     loginScreen.style.opacity = '1';
                 }
-                // Verstecke den App-Container
                 if (appContainer) {
                     appContainer.classList.add('hidden');
                     appContainer.style.opacity = '0';
                 }
             } else {
-                // Bei erfolgreichem Login den App-Container anzeigen.
                 if (appContainer) {
                     appContainer.classList.remove('hidden');
                     appContainer.style.opacity = '1';
                 }
-                // Login-Screen ausblenden
                 if (loginScreen) {
                     loginScreen.classList.add('hidden');
                     loginScreen.style.opacity = '0';
@@ -127,14 +136,11 @@
             }
         }
 
-        // Global verfügbare Logout-Funktion
         window.logout = function() {
             sessionStorage.removeItem('isLoggedIn');
-            window.location.href = 'index.html'; // Leite immer zur Hauptseite weiter (wird beim Logout beibehalten)
+            window.location.href = 'index.html'; 
         }
-        // --------------------------------------------------
         
-        // --- Login Formular Handling ---
         const CORRECT_USERNAME = 'admin';
         const CORRECT_PASSWORD = 'admin';
 
@@ -152,18 +158,18 @@
                 sessionStorage.setItem('isLoggedIn', 'true');
                 errorMessage.classList.add('hidden');
                 
-                // Nach erfolgreicher Anmeldung die Seite neu laden, um den Inhalt anzuzeigen
                 window.location.reload(); 
             } else {
                 errorMessage.classList.remove('hidden');
-                passwordInput.value = ''; // Passwortfeld leeren
+                passwordInput.value = ''; 
             }
         }
         // --------------------------------------------------
 
+        // --- Preislisten-Logik (mit localStorage) ---
 
-        // Statische Preisliste (Brutto-Preis pro Festmeter (fm) in Euro)
-        const PREISLISTE = {
+        // Statische Standard-Preisliste (Fallback)
+        const DEFAULT_PREISLISTE = {
             'Fichte': {
                 'A/B': 120.00,
                 'B-Braunkern': 100.00,
@@ -196,11 +202,22 @@
             }
         };
 
+        // Lade Preisliste aus localStorage oder verwende Standard
+        function loadPriceList() {
+            const storedList = localStorage.getItem('sägewerkPreisliste');
+            return storedList ? JSON.parse(storedList) : DEFAULT_PREISLISTE;
+        }
+
+        // Speichere Preisliste in localStorage
+        function savePriceList(list) {
+            localStorage.setItem('sägewerkPreisliste', JSON.stringify(list));
+        }
+
         // Funktion zum Rendern der Preisliste
         function renderPriceList() {
-            // Stellen Sie sicher, dass wir nur rendern, wenn der Benutzer angemeldet ist
             if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
 
+            const PREISLISTE = loadPriceList();
             const container = document.getElementById('price-list-container');
             container.innerHTML = '';
             
@@ -208,17 +225,53 @@
                 const prices = PREISLISTE[holzart];
                 
                 let tableRows = '';
+                // 1. Rendern der bestehenden Qualitäten
                 for (const qualitaet in prices) {
+                    // Erstellen der eindeutigen ID für das Eingabefeld
+                    const inputId = `${holzart}-${qualitaet.replace(/[^a-zA-Z0-9]/g, '_')}`;
+                    
                     tableRows += `
-                        <tr class="border-b hover:bg-gray-50">
+                        <tr class="border-b hover:bg-gray-50 group">
                             <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">${qualitaet}</td>
-                            <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-right text-green-700">${prices[qualitaet].toFixed(2)} €</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-right text-green-700">
+                                <input type="number" step="0.01" value="${prices[qualitaet].toFixed(2)}" 
+                                       id="${inputId}" data-holzart="${holzart}" data-qualitaet="${qualitaet}"
+                                       class="edit-input bg-transparent focus:bg-white focus:border-blue-500 transition duration-150">
+                            </td>
+                            <td class="px-3 py-3 text-right text-xs">
+                                <button onclick="deletePrice('${holzart}', '${qualitaet}')"
+                                    title="Diesen Eintrag entfernen"
+                                    class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    &times; Löschen
+                                </button>
+                            </td>
                         </tr>
                     `;
                 }
+                
+                // 2. Erweiterten Hinzufügen-Modus (neue Zeile)
+                const newQualitaetId = `new-qualitaet-${holzart}`;
+                const newPriceId = `new-price-${holzart}`;
+                
+                tableRows += `
+                    <tr class="bg-blue-50 border-t-2 border-blue-200">
+                        <td class="px-6 py-3">
+                            <input type="text" id="${newQualitaetId}" placeholder="Neue Qualität (z.B. C/D)" class="w-full p-2 text-sm border border-blue-300 rounded-md focus:ring-blue-500">
+                        </td>
+                        <td class="px-6 py-3 text-right">
+                            <input type="number" step="0.01" id="${newPriceId}" placeholder="Preis (€)" class="edit-input text-sm border-blue-300 focus:ring-blue-500">
+                        </td>
+                        <td class="px-3 py-3 text-right">
+                            <button onclick="addPrice('${holzart}', '${newQualitaetId}', '${newPriceId}')" 
+                                    class="bg-blue-500 text-white text-xs font-semibold py-1 px-3 rounded-lg hover:bg-blue-600 transition duration-200">
+                                + Hinzufügen
+                            </button>
+                        </td>
+                    </tr>
+                `;
 
                 const html = `
-                    <div class="bg-white p-6 shadow-xl rounded-xl border border-gray-100">
+                    <div class="bg-white p-6 shadow-2xl rounded-xl border border-gray-100">
                         <h3 class="text-2xl font-bold text-blue-700 mb-4 border-b-2 pb-2">${holzart}</h3>
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -226,6 +279,7 @@
                                     <tr>
                                         <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
                                         <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Brutto (€/fm)</th>
+                                        <th class="px-3 py-3 w-16"></th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
@@ -238,13 +292,93 @@
                 container.insertAdjacentHTML('beforeend', html);
             }
         }
+        
+        // --- CRUD Operationen für Preise ---
+
+        // Fügt einen neuen Preis hinzu
+        window.addPrice = function(holzart, qualitaetId, priceId) {
+            const qualitaet = document.getElementById(qualitaetId).value.trim();
+            const price = parseFloat(document.getElementById(priceId).value);
+
+            if (!qualitaet || isNaN(price) || price <= 0) {
+                showFeedback('Bitte geben Sie eine gültige Qualität und einen positiven Preis ein.', true, 'text-red-600');
+                return;
+            }
+            
+            const currentList = loadPriceList();
+            if (currentList[holzart][qualitaet]) {
+                showFeedback(`Qualität '${qualitaet}' existiert für ${holzart} bereits. Bitte bearbeiten Sie den bestehenden Eintrag.`, true, 'text-red-600');
+                return;
+            }
+
+            currentList[holzart][qualitaet] = price;
+            savePriceList(currentList);
+            renderPriceList(); // Neu rendern, um die neue Zeile anzuzeigen
+            showFeedback(`Neue Qualität '${qualitaet}' für ${holzart} hinzugefügt.`, false, 'text-green-600');
+        }
+
+        // Löscht einen Preis
+        window.deletePrice = function(holzart, qualitaet) {
+            // Keine window.confirm() verwenden
+            const currentList = loadPriceList();
+            
+            if (currentList[holzart] && currentList[holzart].hasOwnProperty(qualitaet)) {
+                delete currentList[holzart][qualitaet];
+                savePriceList(currentList);
+                renderPriceList();
+                showFeedback(`Eintrag '${qualitaet}' für ${holzart} gelöscht.`, false, 'text-green-600');
+            }
+        }
+        
+        // Speichert alle Änderungen aus den Eingabefeldern
+        window.saveAllPrices = function() {
+            const currentList = loadPriceList();
+            let hasError = false;
+
+            // Iteriere über alle Preis-Input-Felder
+            document.querySelectorAll('.edit-input').forEach(input => {
+                const holzart = input.getAttribute('data-holzart');
+                const qualitaet = input.getAttribute('data-qualitaet');
+                const price = parseFloat(input.value);
+
+                if (holzart && qualitaet) {
+                    if (isNaN(price) || price <= 0) {
+                        input.classList.add('border-red-500');
+                        hasError = true;
+                    } else {
+                        input.classList.remove('border-red-500');
+                        // Preis in der Liste aktualisieren
+                        if (currentList[holzart] && currentList[holzart].hasOwnProperty(qualitaet)) {
+                            currentList[holzart][qualitaet] = price;
+                        }
+                    }
+                }
+            });
+            
+            if (hasError) {
+                showFeedback('Fehler beim Speichern: Bitte korrigieren Sie die ungültigen Preise (rot markiert).', true, 'text-red-600');
+                return;
+            }
+
+            savePriceList(currentList);
+            renderPriceList(); // Neu rendern, um formatierte Preise zu sehen
+            showFeedback('Alle Preisänderungen wurden erfolgreich gespeichert!', false, 'text-green-600');
+        }
+
+        // Feedback-Nachricht anzeigen
+        function showFeedback(message, isError, colorClass = 'text-blue-600') {
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = message;
+            feedback.className = `text-sm font-medium mb-4 ${colorClass}`;
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 5000);
+        }
 
         
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuth(); // WICHTIG: Prüft die Anmeldung
-            renderPriceList(); // Zeigt die Preisliste an
+            checkAuth(); 
+            renderPriceList(); 
             
-            // Login Event Listener hinzufügen
             const loginForm = document.getElementById('login-form');
             if (loginForm) {
                 loginForm.addEventListener('submit', handleLogin);
