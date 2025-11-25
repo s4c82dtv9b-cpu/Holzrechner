@@ -3,343 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preise & Tarife Verwaltung</title>
-    <!-- Einbindung von Tailwind CSS für Styling -->
+    <title>Holzrechner Preisliste (Geschützt)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Setzt die Standard-Schriftart auf Inter und sorgt für eine fließende Höhe */
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-        /* Anpassung für die Tabelle auf kleinen Bildschirmen */
-        .price-table th, .price-table td {
-            white-space: nowrap; /* Verhindert Zeilenumbrüche in den Tabellenzellen */
-        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Navigationsleiste -->
-    <nav class="bg-white shadow-lg p-4 sticky top-0 z-10">
-        <div class="container mx-auto flex justify-between items-center max-w-7xl">
-            <!-- Logo oder Markenname -->
-            <!-- Annahme: Firmenname ist "Sägewerk Mülleder" basierend auf dem letzten Index-Dokument -->
-            <a href="index.html" class="text-xl font-bold text-blue-600">Sägewerk Mülleder</a>
-            <!-- Navigationslinks -->
-            <div class="flex space-x-4">
-                <a href="index.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Dashboard</a>
-                <a href="archiv.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Archiv</a>
-                <a href="kunden.html" class="text-gray-600 hover:text-blue-600 transition duration-300">Kunden</a>
-                <a href="preise.html" class="text-blue-600 font-semibold hover:text-blue-800 transition duration-300 border-b-2 border-blue-600 pb-1">Preise</a>
-            </div>
+    <!-- SICHERHEIT: ANMELDEBILDSCHIRM (Muss auf jeder geschützten Seite vorhanden sein) -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gray-50 fixed inset-0 z-50 hidden opacity-0">
+        <div class="w-full max-w-md bg-white p-8 shadow-2xl rounded-xl border border-gray-100 transition-opacity duration-500 ease-in-out">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Zugriff erforderlich</h1>
+            <p id="error-message" class="text-red-600 font-medium mb-4 text-center hidden">Falscher Benutzername oder falsches Passwort.</p>
+            
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Benutzername (admin)</label>
+                    <input type="text" id="username" name="username" required
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
+                           placeholder="Benutzername eingeben">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Passwort (admin)</label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
+                           placeholder="Passwort eingeben">
+                </div>
+                <button type="submit" 
+                        class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
+                    Anmelden
+                </button>
+            </form>
         </div>
-    </nav>
+    </div>
+    <!-- ENDE: SICHERHEIT: ANMELDEBILDSCHIRM -->
 
-    <!-- Hauptinhalt (Preis-Tabelle) -->
-    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
-        <div class="bg-white p-6 sm:p-10 shadow-2xl rounded-xl w-full">
-            <h1 class="text-3xl font-bold text-blue-700 mb-2">Holz-Preisliste & Tarife</h1>
-            <p class="text-lg text-gray-600 mb-8">
-                Verwalten Sie hier alle aktuellen Einkaufspreise pro Festmeter (fm).
-            </p>
 
-            <!-- Button zum Umschalten der Formularansicht -->
-            <button id="toggle-form-button" class="px-6 py-2 mb-6 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
-                Neue Preisposition hinzufügen
-            </button>
+    <!-- Hauptinhalts-Container (Startet versteckt, wird durch JS sichtbar) -->
+    <div id="app-container" class="hidden opacity-0 min-h-screen flex flex-col w-full transition-opacity duration-500 ease-in-out">
 
-            <!-- Formular zum Hinzufügen/Bearbeiten von Preisen (Anfangs ausgeblendet) -->
-            <div id="price-form-container" class="hidden bg-blue-50 p-6 rounded-lg mb-8 border border-blue-200">
-                <h2 id="form-title" class="text-xl font-semibold text-blue-700 mb-4">Neue Preisposition anlegen</h2>
-                <form id="price-entry-form" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <!-- Verstecktes Feld zur Speicherung der ID bei Bearbeitung -->
-                    <input type="hidden" id="editing-id" value="">
-                    
-                    <!-- Felder für die Preisdaten -->
-                    <div class="col-span-1">
-                        <label for="holzart" class="block text-sm font-medium text-gray-700">Holzart</label>
-                        <input type="text" id="holzart" name="holzart" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
-                    </div>
-                    <div class="col-span-1">
-                        <label for="qualitaet" class="block text-sm font-medium text-gray-700">Qualität</label>
-                        <input type="text" id="qualitaet" name="qualitaet" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
-                    </div>
-                    <div class="col-span-1">
-                        <label for="klasse" class="block text-sm font-medium text-gray-700">Klasse</label>
-                        <input type="text" id="klasse" name="klasse" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
-                    </div>
-                    <div class="col-span-1">
-                        <label for="orAb" class="block text-sm font-medium text-gray-700">oR ab (cm)</label>
-                        <input type="text" id="orAb" name="orAb" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
-                    </div>
-                    <div class="col-span-1">
-                        <label for="irAb" class="block text-sm font-medium text-gray-700">iR ab (cm)</label>
-                        <input type="text" id="irAb" name="irAb" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
-                    </div>
-                    <div class="col-span-1">
-                        <label for="laenge" class="block text-sm font-medium text-gray-700">Länge</label>
-                        <input type="text" id="laenge" name="laenge" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" placeholder="z.B. '2.5m - 5m' oder leer">
-                    </div>
-                    <div class="col-span-1">
-                        <label for="preis" class="block text-sm font-medium text-gray-700">Preis (€/fm)</label>
-                        <input type="number" step="0.01" id="preis" name="preis" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border">
-                    </div>
-
-                    <!-- Button für Speichern/Aktualisieren -->
-                    <div class="col-span-2 md:col-span-4 flex space-x-4 mt-4">
-                        <button type="submit" id="submit-button" class="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-300 shadow-md">
-                            Speichern
-                        </button>
-                        <button type="button" onclick="window.resetFormAndHide()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-300">
-                            Abbrechen
-                        </button>
-                    </div>
-                </form>
+        <!-- Navigationsleiste -->
+        <nav class="bg-white shadow-xl p-4 sticky top-0 z-10">
+            <div class="container mx-auto flex justify-between items-center max-w-7xl">
+                <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
+                <div class="flex space-x-6 items-center">
+                    <a href="index.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Dashboard</a>
+                    <a href="archiv.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Archiv</a>
+                    <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
+                    <a href="preise.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Preise</a>
+                    <!-- Logout Button -->
+                    <button onclick="window.logout()" class="text-red-600 hover:text-red-800 font-medium transition duration-300 ml-4 py-1 px-3 border border-red-200 rounded-lg">
+                        Logout
+                    </button>
+                </div>
             </div>
+        </nav>
 
+        <!-- Hauptinhalt (Preise Ansicht) -->
+        <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+            <h1 class="text-4xl font-extrabold text-blue-700 mb-8 text-center sm:text-left">
+                Aktuelle Preisliste (Brutto pro Festmeter)
+            </h1>
 
-            <!-- Preisliste Tabelle -->
-            <div class="overflow-x-auto rounded-lg shadow-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200 price-table">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Holzart</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Klasse</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">oR ab</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">iR ab</th>
-                            <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Länge</th>
-                            <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Preis (€/fm)</th>
-                            <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
-                        </tr>
-                    </thead>
-                    <tbody id="price-table-body" class="bg-white divide-y divide-gray-100">
-                        <!-- Preispositionen werden hier dynamisch eingefügt -->
-                    </tbody>
-                </table>
+            <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-12 border-t-6 border-blue-600">
+                <p class="text-sm text-gray-500 mb-6">Hinweis: Alle Preise sind Bruttopreise (inkl. 13% MwSt.) pro Festmeter (fm).</p>
+                
+                <div id="price-list-container" class="space-y-6">
+                    <!-- Preislisten werden hier dynamisch eingefügt -->
+                </div>
+                
             </div>
+            
+        </main>
 
-            <!-- Feedback Message -->
-            <div id="feedback-message" class="mt-4 text-center text-sm font-semibold hidden"></div>
+        <!-- Fußzeile -->
+        <footer class="bg-gray-800 text-white p-6 mt-auto">
+            <div class="container mx-auto text-center text-sm">
+                <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
+            </div>
+        </footer>
+        
+    </div> <!-- Ende app-container -->
 
-        </div>
-    </main>
 
-    <!-- Fußzeile -->
-    <footer class="bg-gray-800 text-white p-4 mt-auto">
-        <div class="container mx-auto text-center text-sm">
-            <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
-        </div>
-    </footer>
-
-    <!-- JavaScript für die Preisverwaltung -->
+    <!-- JavaScript für die Preis-Logik -->
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Standard-Daten (Ihre Liste)
-        const initialPriceData = [
-            { holzart: "Fichte", qualitaet: "A/B", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 90.00 },
-            { holzart: "Fichte", qualitaet: "A/B", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 110.00 },
-            { holzart: "Fichte", qualitaet: "A/B", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 120.00 },
-            { holzart: "Fichte", qualitaet: "Braunholz", klasse: "1b+", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 90.00 },
-            { holzart: "Fichte", qualitaet: "C-Holz", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 60.00 },
-            { holzart: "Fichte", qualitaet: "C-Holz", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 80.00 },
-            { holzart: "Fichte", qualitaet: "C-Holz", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 90.00 },
-            { holzart: "Kiefer", qualitaet: "A/B", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 60.00 },
-            { holzart: "Kiefer", qualitaet: "A/B", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 80.00 },
-            { holzart: "Kiefer", qualitaet: "A/B", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 90.00 },
-            // Fehlende Preise auf 0.00 setzen, damit sie bearbeitet werden können
-            { holzart: "Kiefer", qualitaet: "C-Holz", klasse: "1b", orAb: "15 cm", irAb: "16 cm", laenge: "", preis: 0.00 },
-            { holzart: "Kiefer", qualitaet: "C-Holz", klasse: "2a", orAb: "20 cm", irAb: "21 cm", laenge: "", preis: 0.00 },
-            { holzart: "Kiefer", qualitaet: "C-Holz", klasse: "2b+", orAb: "25 cm", irAb: "26 cm", laenge: "", preis: 0.00 },
-        ];
+        // --- Zwingende Sicherheitsprüfung für JEDE Seite ---
+        function checkAuth() {
+            const loginScreen = document.getElementById('login-screen');
+            const appContainer = document.getElementById('app-container');
 
-        // Funktion zum Laden der Daten
-        function loadPrices() {
-            let prices = localStorage.getItem('woodPrices');
-            if (prices) {
-                return JSON.parse(prices);
-            }
-            // Wenn keine Daten vorhanden, Initialdaten mit IDs befüllen
-            return initialPriceData.map((item, index) => ({ ...item, id: Date.now() + index }));
-        }
-
-        let priceList = loadPrices();
-
-        // Funktion zum Speichern der Daten
-        function savePrices() {
-            localStorage.setItem('woodPrices', JSON.stringify(priceList));
-        }
-
-        // --- UI Hilfsfunktionen ---
-
-        function showFeedback(message, isError = false) {
-            const feedback = document.getElementById('feedback-message');
-            feedback.textContent = message;
-            feedback.className = `mt-4 text-center text-sm font-semibold ${isError ? 'text-red-600' : 'text-green-600'}`;
-            feedback.classList.remove('hidden');
-            setTimeout(() => feedback.classList.add('hidden'), 3000);
-        }
-
-        window.showForm = function(isEditing = false) {
-            const container = document.getElementById('price-form-container');
-            const title = document.getElementById('form-title');
-            const button = document.getElementById('submit-button');
-            
-            container.classList.remove('hidden');
-            document.getElementById('toggle-form-button').classList.add('hidden');
-            
-            if (isEditing) {
-                title.textContent = "Preisposition bearbeiten";
-                button.textContent = "Änderungen speichern";
-                button.classList.replace('bg-green-600', 'bg-blue-600');
-            } else {
-                title.textContent = "Neue Preisposition anlegen";
-                button.textContent = "Speichern";
-                button.classList.replace('bg-blue-600', 'bg-green-600');
-            }
-        }
-
-        window.hideForm = function() {
-            document.getElementById('price-form-container').classList.add('hidden');
-            document.getElementById('toggle-form-button').classList.remove('hidden');
-        }
-        
-        window.resetFormAndHide = function() {
-            document.getElementById('price-entry-form').reset();
-            document.getElementById('editing-id').value = '';
-            window.hideForm();
-        }
-
-        // --- CRUD Operationen ---
-
-        // Funktion zum Rendern der Tabelle
-        function renderPriceTable() {
-            const tbody = document.getElementById('price-table-body');
-            tbody.innerHTML = '';
-
-            if (priceList.length === 0) {
-                 const row = tbody.insertRow();
-                 row.innerHTML = `<td colspan="8" class="px-3 py-4 text-center text-sm text-gray-500 italic bg-white">Keine Preispositionen angelegt.</td>`;
-                 return;
-            }
-
-            priceList.forEach(entry => {
-                const row = tbody.insertRow();
-                row.className = 'hover:bg-blue-50 transition duration-100';
-
-                // Datenzellen
-                row.insertCell().textContent = entry.holzart;
-                row.insertCell().textContent = entry.qualitaet;
-                row.insertCell().textContent = entry.klasse;
-                row.insertCell().textContent = entry.orAb;
-                row.insertCell().textContent = entry.irAb;
-                row.insertCell().textContent = entry.laenge;
-
-                // Preis (rechtsbündig)
-                const preisCell = row.insertCell();
-                preisCell.textContent = parseFloat(entry.preis).toFixed(2).replace('.', ',') + ' €';
-                preisCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-bold text-green-700 text-right';
-
-                // Aktionen
-                const actionsCell = row.insertCell();
-                actionsCell.className = 'px-3 py-2 whitespace-nowrap text-right';
-                actionsCell.innerHTML = `
-                    <button onclick="window.editPrice(${entry.id})" class="text-blue-600 hover:text-blue-900 text-sm font-medium mr-2 transition duration-150">Bearbeiten</button>
-                    <button onclick="window.deletePrice(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium transition duration-150">Löschen</button>
-                `;
-            });
-        }
-
-        // Bearbeitungsfunktion
-        window.editPrice = function(id) {
-            const entryToEdit = priceList.find(e => e.id === id);
-            if (entryToEdit) {
-                // Formularfelder füllen
-                document.getElementById('holzart').value = entryToEdit.holzart;
-                document.getElementById('qualitaet').value = entryToEdit.qualitaet;
-                document.getElementById('klasse').value = entryToEdit.klasse;
-                document.getElementById('orAb').value = entryToEdit.orAb;
-                document.getElementById('irAb').value = entryToEdit.irAb;
-                document.getElementById('laenge').value = entryToEdit.laenge;
-                document.getElementById('preis').value = entryToEdit.preis;
-
-                document.getElementById('editing-id').value = id;
-                window.showForm(true); // Formular im Bearbeitungsmodus anzeigen
-                document.getElementById('holzart').focus();
-            }
-        }
-
-        // Löschfunktion
-        window.deletePrice = function(id) {
-            const originalLength = priceList.length;
-            priceList = priceList.filter(e => e.id !== id);
-            
-            if (priceList.length < originalLength) {
-                savePrices();
-                renderPriceTable();
-                showFeedback('Preisposition erfolgreich gelöscht.');
-            } else {
-                showFeedback('Fehler beim Löschen der Preisposition.', true);
-            }
-        }
-
-        // Formular-Submit-Handler (Hinzufügen und Speichern)
-        document.getElementById('price-entry-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const form = e.target;
-            const isEditing = !!document.getElementById('editing-id').value;
-
-            const newEntry = {
-                holzart: form.holzart.value,
-                qualitaet: form.qualitaet.value,
-                klasse: form.klasse.value,
-                orAb: form.orAb.value,
-                irAb: form.irAb.value,
-                laenge: form.laenge.value,
-                preis: parseFloat(form.preis.value)
-            };
-
-            if (isNaN(newEntry.preis)) {
-                showFeedback('Fehler: Preis muss eine gültige Zahl sein.', true);
-                return;
-            }
-
-            if (isEditing) {
-                // Aktualisieren
-                const id = parseInt(document.getElementById('editing-id').value);
-                const index = priceList.findIndex(e => e.id === id);
-                
-                if (index !== -1) {
-                    priceList[index] = { ...newEntry, id: id };
-                    showFeedback('Preisposition erfolgreich aktualisiert!');
+            // Wenn der "isLoggedIn"-Flag nicht in der Session gesetzt ist...
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+                // Zeige den Login-Screen auf dieser Seite
+                if (loginScreen) {
+                    loginScreen.classList.remove('hidden');
+                    loginScreen.style.opacity = '1';
+                }
+                // Verstecke den App-Container
+                if (appContainer) {
+                    appContainer.classList.add('hidden');
+                    appContainer.style.opacity = '0';
                 }
             } else {
-                // Hinzufügen
-                newEntry.id = Date.now();
-                priceList.push(newEntry);
-                showFeedback('Neue Preisposition erfolgreich hinzugefügt!');
+                // Bei erfolgreichem Login den App-Container anzeigen.
+                if (appContainer) {
+                    appContainer.classList.remove('hidden');
+                    appContainer.style.opacity = '1';
+                }
+                // Login-Screen ausblenden
+                if (loginScreen) {
+                    loginScreen.classList.add('hidden');
+                    loginScreen.style.opacity = '0';
+                }
             }
+        }
 
-            savePrices();
-            renderPriceTable();
-            window.resetFormAndHide();
-        });
+        // Global verfügbare Logout-Funktion
+        window.logout = function() {
+            sessionStorage.removeItem('isLoggedIn');
+            window.location.href = 'index.html'; // Leite immer zur Hauptseite weiter (wird beim Logout beibehalten)
+        }
+        // --------------------------------------------------
         
-        // Button zum Formular anzeigen
-        document.getElementById('toggle-form-button').addEventListener('click', () => {
-             window.resetFormAndHide(); // Erst resetten, um sicherzustellen, dass es ein neuer Eintrag ist
-             window.showForm(false);
-             document.getElementById('holzart').focus();
+        // --- Login Formular Handling ---
+        const CORRECT_USERNAME = 'admin';
+        const CORRECT_PASSWORD = 'admin';
+
+        function handleLogin(event) {
+            event.preventDefault();
+
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('error-message');
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (username === CORRECT_USERNAME && password === CORRECT_PASSWORD) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                errorMessage.classList.add('hidden');
+                
+                // Nach erfolgreicher Anmeldung die Seite neu laden, um den Inhalt anzuzeigen
+                window.location.reload(); 
+            } else {
+                errorMessage.classList.remove('hidden');
+                passwordInput.value = ''; // Passwortfeld leeren
+            }
+        }
+        // --------------------------------------------------
+
+
+        // Statische Preisliste (Brutto-Preis pro Festmeter (fm) in Euro)
+        const PREISLISTE = {
+            'Fichte': {
+                'A/B': 120.00,
+                'B-Braunkern': 100.00,
+                'CX': 70.00,
+                'Käferholz': 50.00
+            },
+            'Tanne': {
+                'A/B': 130.00,
+                'B-Braunkern': 110.00,
+                'CX': 75.00,
+                'Käferholz': 55.00
+            },
+            'Eiche': {
+                'A/B': 250.00,
+                'B-Braunkern': 200.00,
+                'CX': 150.00,
+                'Käferholz': 100.00 
+            },
+            'Lärche': {
+                'A/B': 150.00,
+                'B-Braunkern': 130.00,
+                'CX': 90.00,
+                'Käferholz': 60.00
+            },
+            'Kiefer': {
+                'A/B': 110.00,
+                'B-Braunkern': 90.00,
+                'CX': 65.00,
+                'Käferholz': 45.00
+            }
+        };
+
+        // Funktion zum Rendern der Preisliste
+        function renderPriceList() {
+            // Stellen Sie sicher, dass wir nur rendern, wenn der Benutzer angemeldet ist
+            if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
+
+            const container = document.getElementById('price-list-container');
+            container.innerHTML = '';
+            
+            for (const holzart in PREISLISTE) {
+                const prices = PREISLISTE[holzart];
+                
+                let tableRows = '';
+                for (const qualitaet in prices) {
+                    tableRows += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-700">${qualitaet}</td>
+                            <td class="px-6 py-3 whitespace-nowrap text-sm font-semibold text-right text-green-700">${prices[qualitaet].toFixed(2)} €</td>
+                        </tr>
+                    `;
+                }
+
+                const html = `
+                    <div class="bg-white p-6 shadow-xl rounded-xl border border-gray-100">
+                        <h3 class="text-2xl font-bold text-blue-700 mb-4 border-b-2 pb-2">${holzart}</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
+                                        <th class="px-6 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Brutto (€/fm)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            }
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth(); // WICHTIG: Prüft die Anmeldung
+            renderPriceList(); // Zeigt die Preisliste an
+            
+            // Login Event Listener hinzufügen
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
         });
-
-
-        // Initialer Aufruf
-        document.addEventListener('DOMContentLoaded', renderPriceTable);
     </script>
 </body>
 </html>
