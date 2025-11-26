@@ -27,1030 +27,857 @@
         .modal-overlay {
             z-index: 50; 
         }
+        /* Definiert die Farben für die Status-Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .status-badge.aktiv {
+            background-color: #d1fae5; /* green-100 */
+            color: #065f46; /* green-800 */
+        }
+        .status-badge.inaktiv {
+            background-color: #f3f4f6; /* gray-100 */
+            color: #4b5563; /* gray-600 */
+        }
+        .status-badge.neu {
+            background-color: #bfdbfe; /* blue-100 */
+            color: #1e40af; /* blue-800 */
+        }
+        .status-badge.in_bearbeitung {
+            background-color: #fef3c7; /* yellow-100 */
+            color: #92400e; /* yellow-800 */
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
-    <!-- Anmeldebildschirm (Standardmäßig sichtbar, wird durch JS gesteuert) -->
-    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gray-50 fixed inset-0 z-50">
-        <div class="w-full max-w-md bg-white p-8 shadow-2xl rounded-xl border border-gray-100 transition-opacity duration-500 ease-in-out">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Zugriff erforderlich</h1>
-            <p id="error-message" class="text-red-600 font-medium mb-4 text-center hidden">Falscher Benutzername oder falsches Passwort.</p>
-            
-            <form id="login-form">
-                <div class="mb-4">
-                    <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Benutzername (admin)</label>
-                    <input type="text" id="username" name="username" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
-                           placeholder="Benutzername eingeben">
-                </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Passwort (admin)</label>
-                    <input type="password" id="password" name="password" required
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition duration-150"
-                           placeholder="Passwort eingeben">
-                </div>
-                <button type="submit" 
-                        class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg shadow-lg hover:bg-blue-700 transition duration-200 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50">
-                    Anmelden
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Hauptinhalts-Container (Startet versteckt oder sichtbar) -->
-    <div id="app-container" class="hidden opacity-0 min-h-screen flex flex-col w-full transition-opacity duration-500 ease-in-out">
-
-        <!-- Navigationsleiste -->
-        <nav class="bg-white shadow-xl p-4 sticky top-0 z-10">
-            <div class="container mx-auto flex justify-between items-center max-w-7xl">
-                <!-- Logo oder Markenname -->
-                <a href="index.html" class="text-2xl font-extrabold text-blue-600">Sägewerk Mülleder</a>
-                <!-- Navigationslinks mit ARCHIV und LOGOUT -->
-                <div class="flex space-x-6 items-center">
-                    <a href="index.html" class="text-blue-600 font-bold hover:text-blue-800 transition duration-300 border-b-3 border-blue-600 pb-1">Dashboard</a>
-                    <a href="archiv.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Archiv</a>
-                    <a href="kunden.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Kunden</a>
-                    <a href="preise.html" class="text-gray-600 hover:text-blue-600 font-medium transition duration-300">Preise</a>
-                    <!-- NEU: Logout Button -->
-                    <button onclick="window.logout()" class="text-red-600 hover:text-red-800 font-medium transition duration-300 ml-4 py-1 px-3 border border-red-200 rounded-lg">
-                        Logout
-                    </button>
-                </div>
+    <!-- Navigationsleiste -->
+    <nav class="bg-white shadow-xl p-4 sticky top-0 z-30 border-b-4 border-teal-600">
+        <div class="container mx-auto flex justify-between items-center max-w-7xl">
+            <a href="index.html" class="text-2xl font-extrabold text-teal-700 tracking-wide">Holzrechner Mülleder</a>
+            <div class="flex space-x-4">
+                <a href="index.html" class="text-teal-700 font-bold hover:text-teal-800 transition duration-300 border-b-2 border-teal-700 pb-1">Startseite (Rechner)</a>
+                <a href="kunden.html" class="text-gray-600 hover:text-teal-700 transition duration-300 font-medium">Kunden</a>
+                <a href="#" class="text-gray-600 hover:text-teal-700 transition duration-300 font-medium">Archiv (i.E.)</a>
             </div>
-        </nav>
+        </div>
+    </nav>
 
-        <!-- Hauptinhalt (Dashboard Ansicht) -->
-        <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
-            <div class="w-full mx-auto">
-                <!-- HAUPTTITEL FÜR DIE SEITE -->
-                <h1 class="text-4xl font-extrabold text-green-700 mb-8 text-center sm:text-left">
-                    Holzrechner Sägewerk Mülleder
-                </h1>
+    <!-- Hauptinhalt (Layout: Eingabe links, Dashboard rechts) -->
+    <main class="flex-grow container mx-auto p-4 sm:p-8 max-w-7xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                <!-- SEKTION: Holzrechner -->
-                <div class="bg-white p-6 sm:p-10 shadow-2xl rounded-xl w-full mb-10 border-t-6 border-blue-600">
+            <!-- LINKER BEREICH: Holzrechner Eingabe und Liste (2/3) -->
+            <div class="lg:col-span-2 space-y-8">
+                
+                <!-- Header / Aktuelle Bestellung -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-200">
+                    <h1 class="text-3xl font-extrabold text-teal-800 mb-2">Aktuelle Holzliste</h1>
+                    <p class="text-lg text-gray-600">Erfassen und verwalten Sie die Stämme der aktuellen Lieferung.</p>
                     
-                    <!-- ÜBERSCHRIFT -->
-                    <h2 class="text-3xl font-bold text-blue-700 mb-8">Holzrechner</h2>
-                    
-                    <!-- Geänderte Grid-Struktur für 6 Spalten auf MD+ (5 Eingaben + 1 Ausgabe, jetzt 2 Ausgaben) -->
-                    <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-7 gap-6 items-end">
+                    <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 flex flex-col md:flex-row justify-between items-start md:items-center">
+                        <div class="mb-2 md:mb-0">
+                            <label for="kunde" class="block text-xs font-bold text-blue-800 uppercase">Kunde (Verpflichtend)</label>
+                            <!-- Eingabe-Dropdown für Kunden -->
+                            <select id="kunde" required class="mt-1 block w-full md:w-80 rounded-lg border-blue-300 shadow-md focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white text-gray-700">
+                                <option value="" disabled selected>Kunden auswählen...</option>
+                            </select>
+                        </div>
+                        <div id="customer-status-badge">
+                            <!-- Hier wird der Kundenstatus angezeigt -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- FORMULAR: Stammdaten-Eingabe -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-200">
+                    <h2 class="text-xl font-bold text-teal-700 mb-4 border-b pb-2">Stamm erfassen</h2>
+                    <form id="wood-entry-form" class="grid grid-cols-2 md:grid-cols-7 gap-4 items-center">
                         
-                        <!-- Verstecktes Feld zur Speicherung der ID bei Bearbeitung -->
+                        <!-- Verstecktes Feld für ID bei Bearbeitung -->
                         <input type="hidden" id="editing-id" value="">
                         
-                        <!-- Feld: Kunde (2 Spalten auf Mobile, 1 auf MD+) -->
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="kunde" class="block text-sm font-semibold text-gray-700">Kunde</label>
-                            <input type="text" id="kunde" name="kunde" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="Name des Kunden">
-                        </div>
-                        
-                        <!-- Feld: Holzart -->
-                        <div class="col-span-1">
-                            <label for="holzart" class="block text-sm font-semibold text-gray-700">Holzart</label>
-                            <select id="holzart" name="holzart" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
-                                <option value="Fichte">Fichte</option>
+                        <!-- Baumart/Güte -->
+                        <div class="col-span-1 md:col-span-2">
+                            <label for="baumart" class="block text-xs font-bold text-gray-700">Baumart/Güte</label>
+                            <select id="baumart" required class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 p-3 border bg-white">
+                                <option value="Fichte A">Fichte A</option>
+                                <option value="Fichte B">Fichte B</option>
                                 <option value="Tanne">Tanne</option>
-                                <option value="Eiche">Eiche</option>
-                                <option value="Lärche">Lärche</option>
                                 <option value="Kiefer">Kiefer</option>
+                                <option value="Lärche">Lärche</option>
+                                <option value="Eiche">Eiche</option>
+                                <option value="Buche">Buche</option>
+                                <option value="Sonstige">Sonstige</option>
                             </select>
                         </div>
-                        
-                        <!-- Feld: Qualität (ehemals Holzklasse) -->
-                        <div class="col-span-1">
-                            <label for="qualitaet" class="block text-sm font-semibold text-gray-700">Qualität</label>
-                            <select id="qualitaet" name="qualitaet" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border bg-white">
-                                <option value="A/B">A/B</option>
-                                <option value="B-Braunkern">B (Braunkern)</option>
-                                <option value="CX">CX</option>
-                                <option value="Käferholz">Käferholz</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Feld: Länge (mit Enter-Funktion) -->
-                        <div class="col-span-1">
-                            <label for="laenge" class="block text-sm font-semibold text-gray-700">Länge (m)</label>
-                            <input type="number" step="0.01" id="laenge" name="laenge" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 4.0">
+
+                        <!-- Länge (Laufmeter) -->
+                        <div class="col-span-1 md:col-span-1">
+                            <label for="laenge" class="block text-xs font-bold text-gray-700">Länge (m)</label>
+                            <input type="number" id="laenge" required step="0.01" min="0.5" placeholder="z.B. 4.10" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 p-3 border">
                         </div>
 
-                        <!-- Feld: Mitteldurchmesser (mit Enter-Funktion) -->
-                        <div class="col-span-1">
-                            <label for="durchmesser" class="block text-sm font-semibold text-gray-700">Mitteldurchmesser (cm)</label>
-                            <input type="number" step="0.1" id="durchmesser" name="durchmesser" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border" placeholder="z.B. 25.5">
-                        </div>
-                        
-                        <!-- Feld: Netto Preis Anzeige (Ausgabe) - BEIBEHALTEN ALS FEEDBACK -->
-                        <div class="col-span-1">
-                            <label class="block text-sm font-semibold text-gray-700">Einzelpreis NETTO (€)</label>
-                            <div id="calculated-price-netto" class="mt-1 block w-full rounded-lg shadow-sm p-3 border border-blue-200 bg-blue-50 text-blue-700 font-bold text-center">
-                                0.00 €
-                            </div>
-                        </div>
-                        
-                        <!-- Feld: Brutto Preis Anzeige (Ausgabe) - BEIBEHALTEN ALS FEEDBACK -->
-                        <div class="col-span-1">
-                            <label class="block text-sm font-semibold text-gray-700">Einzelpreis BRUTTO (€)</label>
-                            <div id="calculated-price-brutto" class="mt-1 block w-full rounded-lg shadow-sm p-3 border border-green-200 bg-green-50 text-green-700 font-bold text-center">
-                                0.00 €
-                            </div>
+                        <!-- Durchmesser (cm) -->
+                        <div class="col-span-1 md:col-span-1">
+                            <label for="durchmesser" class="block text-xs font-bold text-gray-700">Durchmesser (cm)</label>
+                            <input type="number" id="durchmesser" required step="1" min="10" placeholder="z.B. 25" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 p-3 border">
                         </div>
 
-                        <!-- Button: Speichern (volle Breite auf Mobile, 7 Spalten auf MD+) -->
-                        <div class="col-span-2 md:col-span-7 flex justify-end mt-4">
-                            <button type="submit" id="save-button" class="w-full sm:w-auto px-10 py-3 text-base font-bold rounded-xl text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-md hover:shadow-lg">
-                                Stamm speichern (oder Enter in Ø)
+                        <!-- Notizen -->
+                        <div class="col-span-1 md:col-span-2">
+                            <label for="notizen" class="block text-xs font-bold text-gray-700">Notizen (optional)</label>
+                            <input type="text" id="notizen" placeholder="z.B. Bläue, Käferholz" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 p-3 border">
+                        </div>
+
+                        <!-- Button -->
+                        <div class="col-span-2 md:col-span-1 pt-4 md:pt-6">
+                            <button type="submit" id="submit-button" class="w-full px-4 py-3 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-300 shadow-md">
+                                Hinzufügen
                             </button>
                         </div>
-                        
-                        <!-- Feedback Message -->
-                        <div id="feedback-message" class="col-span-2 md:col-span-7 text-sm font-semibold hidden pt-2"></div>
+
+                        <!-- Feedback-Nachricht -->
+                        <div id="feedback-message" class="hidden"></div>
                     </form>
                 </div>
                 
-                <!-- SEKTION: Eingegebene Stämme Tabelle -->
-                <div class="bg-white p-6 sm:p-8 shadow-2xl rounded-xl w-full mb-12 border-t-6 border-gray-300">
-                    <h2 class="text-3xl font-bold text-gray-700 mb-6">Erfasste Stämme & Gutschrifts-Daten</h2>
-                    
-                    <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-inner">
+                <!-- Tabelle: Erfasste Stämme -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-200">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h2 class="text-xl font-bold text-teal-700">Erfasste Stämme (<span id="total-stamme">0</span>)</h2>
+                        <button id="clear-list-button" class="px-3 py-1 text-sm font-medium text-red-600 bg-red-100 rounded-lg hover:bg-red-200 transition duration-200 shadow-sm">
+                            Liste löschen
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-lg border border-gray-200">
                         <table class="min-w-full divide-y divide-gray-200 table-font">
-                            <thead class="bg-gray-100">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Kunde</th>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Holzart</th>
-                                    <th class="px-3 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Qualität</th>
-                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Länge (m)</th>
-                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Ø (cm)</th>
-                                    <th class="px-3 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Klassifizierung</th>
-                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Festmeter (fm)</th>
-                                    <th class="px-3 py-3 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Aktionen</th>
+                                    <th class="px-3 py-2 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Lauf. Nr.</th>
+                                    <th class="px-3 py-2 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Baumart/Güte</th>
+                                    <th class="px-3 py-2 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Länge (m)</th>
+                                    <th class="px-3 py-2 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Durchmesser (cm)</th>
+                                    <th class="px-3 py-2 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Festmeter (FM)</th>
+                                    <th class="px-3 py-2 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Notizen</th>
+                                    <th class="px-3 py-2 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aktionen</th>
                                 </tr>
                             </thead>
                             <tbody id="wood-table-body" class="bg-white divide-y divide-gray-100">
-                                <!-- Einträge werden hier dynamisch eingefügt -->
+                                <!-- Daten werden hier eingefügt -->
                             </tbody>
-                            <tfoot>
-                                <!-- Colspan auf 6 reduziert, um unter Festmeter auszurichten. -->
-                                <tr class="bg-blue-50 font-extrabold border-t-2 border-blue-200">
-                                    <td colspan="6" class="px-3 py-3 text-right text-sm text-blue-800">Gesamtvolumen:</td>
-                                    <td id="total-volume" class="px-3 py-3 text-right text-sm text-blue-700">0.000 fm</td>
-                                    <td class="px-3 py-3"></td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
-                    
-                    <!-- Buttons für Archivierung und PDF -->
-                    <div class="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
-                        <div class="flex space-x-3 w-full sm:w-auto">
-                            <button id="pdf-save-button" onclick="window.generatePDF()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition duration-300 shadow-md">
-                                Gutschrift als PDF
-                            </button>
-                            <!-- Der "Liste archivieren"-Button, der window.confirmArchive() aufruft. -->
-                            <button id="archive-table-button" onclick="window.confirmArchive()" class="w-1/2 sm:w-auto px-6 py-2.5 text-base font-semibold text-blue-700 bg-blue-100 rounded-xl hover:bg-blue-200 transition duration-300">
-                                Liste archivieren
-                            </button>
-                        </div>
-                        <!-- Liste leeren (als Alternative zur Archivierung) -->
-                        <button id="clear-table-button" onclick="window.confirmClear()" class="w-full sm:w-auto px-6 py-2.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-300 border border-gray-200">
-                            Liste leeren (Verlust!)
+                </div>
+
+            </div>
+            
+            <!-- RECHTER BEREICH: Dashboard (1/3) -->
+            <div class="lg:col-span-1 space-y-8">
+                
+                <!-- Gesamtergebnis Karte -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border-l-8 border-teal-600">
+                    <h2 class="text-2xl font-bold text-gray-700 mb-2">Gesamtergebnis</h2>
+                    <div class="text-sm font-medium text-gray-500">Aktuelles Volumen der Liste:</div>
+                    <div id="total-cubic-meters" class="text-5xl font-extrabold text-teal-800 mt-2">0.00 FM</div>
+                    <div id="total-price" class="text-xl font-semibold text-gray-700 mt-4">Gesamtwert: <span class="font-extrabold text-green-700">€ 0.00</span></div>
+                </div>
+
+                <!-- Schnelle Aktionen -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Export & Verwaltung</h2>
+                    <div class="space-y-3">
+                        <button id="export-pdf-button" class="w-full flex items-center justify-center p-3 bg-teal-600 rounded-lg text-white font-bold hover:bg-teal-700 transition duration-200 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1l4 4 4-4m-4 4V7" />
+                            </svg>
+                            PDF-Lieferschein erstellen
+                        </button>
+                        <a href="kunden.html" class="w-full flex items-center justify-center p-3 bg-blue-600 rounded-lg text-white font-bold hover:bg-blue-700 transition duration-200 shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-5m0 0l-4-4m4 4V7a2 2 0 00-2-2h-5" />
+                            </svg>
+                            Zur Kundenverwaltung
+                        </a>
+                        <button id="save-to-archive-button" class="w-full flex items-center justify-center p-3 bg-gray-200 rounded-lg text-gray-700 font-bold hover:bg-gray-300 transition duration-200 shadow-md">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                            </svg>
+                            Archivieren (Liste leeren)
                         </button>
                     </div>
                 </div>
 
-                
+                <!-- Preisübersicht -->
+                <div class="bg-white p-6 rounded-xl shadow-xl border border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Preiskalkulation</h2>
+                    <p class="text-sm text-gray-600 mb-3">Aktuelle Preise pro Festmeter (FM):</p>
+                    <div id="price-list" class="space-y-2">
+                        <!-- Preise werden hier dynamisch eingefügt -->
+                    </div>
+                    <div class="text-xs text-gray-500 mt-4 p-2 bg-gray-50 rounded-lg">
+                        Hinweis: Die Preise basieren auf simulierten Werten im JavaScript-Code.
+                    </div>
+                </div>
             </div>
-        </main>
 
-        <!-- Fußzeile -->
-        <footer class="bg-gray-800 text-white p-6 mt-auto">
-            <div class="container mx-auto text-center text-sm">
-                <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
-            </div>
-        </footer>
-        
-    </div> <!-- Ende app-container -->
+        </div>
+    </main>
     
-    <!-- Benutzerdefiniertes Bestätigungs-Modal (ersetzt prompt/confirm) -->
-    <div id="confirmation-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300">
-        <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100">
-            <h3 id="modal-title" class="text-xl font-bold text-gray-900 mb-4">Aktion bestätigen</h3>
-            <p id="modal-message" class="text-gray-600 mb-6">Sind Sie sicher, dass Sie diesen Vorgang durchführen möchten?</p>
+    <!-- Fußzeile -->
+    <footer class="bg-gray-800 text-white p-4 mt-auto">
+        <div class="container mx-auto text-center text-sm">
+            <p>&copy; <span id="year"></span> Sägewerk Mülleder. Alle Rechte vorbehalten.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL für Löschbestätigung -->
+    <div id="confirm-modal" class="modal-overlay hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm transform transition-all duration-300 scale-100">
+            <h3 class="text-xl font-bold text-red-600 mb-4">Achtung! Liste löschen</h3>
+            <p class="text-gray-700 mb-6">Sind Sie sicher, dass Sie alle <span id="modal-count">X</span> erfassten Stämme unwiderruflich aus der Liste entfernen möchten?</p>
             <div class="flex justify-end space-x-3">
-                <button onclick="window.hideConfirmation(false)" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition duration-150">
-                    Abbrechen
-                </button>
-                <button id="modal-confirm-button" onclick="window.hideConfirmation(true)" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition duration-150">
-                    Bestätigen
-                </button>
+                <button id="modal-cancel" class="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 font-medium">Abbrechen</button>
+                <button id="modal-confirm" class="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 font-bold">Liste löschen</button>
             </div>
         </div>
     </div>
 
 
-    <!-- JavaScript für die Eingabelogik, Volumenberechnung und Tabelle -->
+    <!-- JavaScript für die Anwendungslogik -->
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // Array zur Speicherung der Holzstämme (dient als temporäre Datenbank)
-        let woodEntries = JSON.parse(localStorage.getItem('woodEntries')) || [];
-        const saveButton = document.getElementById('save-button');
-        
-        // Temporäre Variable zur Speicherung der Funktion, die nach Bestätigung ausgeführt werden soll
-        let actionOnConfirm = null; 
-        let actionParam = null;
-        
-        // Konstanter Mehrwertsteuersatz (13%)
-        const MWST_RATE = 0.13;
-        const MWST_FAKTOR_BRUTTO_ZU_NETTO = 1 / (1 + MWST_RATE); // 1 / 1.13
+        // --- KONSTANTEN UND DATENVERWALTUNG ---
 
-        // Statische Preisliste (Preis pro Festmeter (fm) in Euro)
-        // WICHTIG: Diese Preise sind der BRUTTO-Preis (inkl. 13% MwSt.)
-        const PREISLISTE = {
-            'Fichte': {
-                'A/B': 120.00,
-                'B-Braunkern': 100.00,
-                'CX': 70.00,
-                'Käferholz': 50.00
-            },
-            'Tanne': {
-                'A/B': 130.00,
-                'B-Braunkern': 110.00,
-                'CX': 75.00,
-                'Käferholz': 55.00
-            },
-            'Eiche': {
-                'A/B': 250.00,
-                'B-Braunkern': 200.00,
-                'CX': 150.00,
-                'Käferholz': 100.00 
-            },
-            'Lärche': {
-                'A/B': 150.00,
-                'B-Braunkern': 130.00,
-                'CX': 90.00,
-                'Käferholz': 60.00
-            },
-            'Kiefer': {
-                'A/B': 110.00,
-                'B-Braunkern': 90.00,
-                'CX': 65.00,
-                'Käferholz': 45.00
-            }
+        // Simulierter Preis pro Festmeter (FM) basierend auf Baumart/Güte
+        const PRICE_LIST = {
+            'Fichte A': 125.00,
+            'Fichte B': 95.00,
+            'Tanne': 85.00,
+            'Kiefer': 70.00,
+            'Lärche': 110.00,
+            'Eiche': 150.00,
+            'Buche': 90.00,
+            'Sonstige': 60.00
         };
 
+        // Hilfsfunktion zum Laden von Kundendaten (identisch zu kunden.html)
+        const initialCustomerData = [
+            { id: 1, name: "Holzbau Schmidt GmbH", kontaktperson: "Max Schmidt", strasse: "Hauptstraße 10", plz: "8010", ort: "Graz", telefon: "0316 12345", email: "max@holzbau.at", status: "Aktiv" },
+            { id: 2, name: "Forstbetrieb Maier", kontaktperson: "Elke Maier", strasse: "Waldweg 5", plz: "8700", ort: "Leoben", telefon: "03842 67890", email: "e.maier@forst.at", status: "Neu" },
+            { id: 3, name: "Tischlerei Huber", kontaktperson: "Johannes Huber", strasse: "Industriepark 22", plz: "9020", ort: "Klagenfurt", telefon: "0463 98765", email: "j.huber@tischlerei.at", status: "In Bearbeitung" },
+            { id: 4, name: "Privatkunde Bauer", kontaktperson: "Karl Bauer", strasse: "Wiesenweg 3", plz: "8042", ort: "Wetzelsdorf", telefon: "0664 1122334", email: "karl.bauer@gmx.at", status: "Inaktiv" },
+        ];
+        
+        function loadCustomers() {
+            let customers = localStorage.getItem('customers');
+            if (customers) {
+                return JSON.parse(customers).map(c => ({ ...c, id: parseInt(c.id) }));
+            }
+            return initialCustomerData.map((item, index) => ({ ...item, id: index + 1 })); // Einfache ID-Zuweisung für Initialdaten
+        }
 
-        // Speichert das aktuelle Array in localStorage
+        // Die Liste, in der die erfassten Holzstämme gespeichert werden (wird aus localStorage geladen)
+        let woodEntries = [];
+
+        function loadEntries() {
+            const data = localStorage.getItem('woodEntries');
+            if (data) {
+                // Konvertiert die IDs und numerischen Felder zurück in Zahlen
+                woodEntries = JSON.parse(data).map(entry => ({
+                    ...entry,
+                    id: parseInt(entry.id),
+                    laenge: parseFloat(entry.laenge),
+                    durchmesser: parseInt(entry.durchmesser),
+                    festmeter: parseFloat(entry.festmeter),
+                    preis: parseFloat(entry.preis)
+                }));
+            } else {
+                woodEntries = [];
+            }
+        }
+
         function saveEntries() {
             localStorage.setItem('woodEntries', JSON.stringify(woodEntries));
         }
 
-        // Funktion zur Volumenberechnung (Huber-Formel / Zylindervolumen)
-        function calculateVolume(length, diameter) {
-            const diameterMeters = diameter / 100;
-            const basalArea = Math.PI / 4 * diameterMeters * diameterMeters;
-            const volume = basalArea * length;
-            return volume; 
+        // --- HILFSFUNKTIONEN ---
+        
+        // Formatiert eine Zahl als Währung
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(amount);
         }
 
         /**
-         * Ruft den BRUTTO-Preis pro Festmeter (fm) basierend auf Holzart und Qualität ab.
+         * Berechnet den Festmeter (FM) nach der zylindrischen Formel (vereinfacht für den Rechner).
+         * Formel: (Durchmesser in cm / 100)^2 * Pi / 4 * Länge in m
+         * Vereinfacht: (Durchmesser^2 * Länge * Pi) / 40000
+         * Durchmesser wird in Meter umgerechnet (cm -> m).
+         * @param {number} durchmesser - Durchmesser in cm
+         * @param {number} laenge - Länge in Meter
+         * @returns {number} Festmeter (FM)
          */
-        function getBruttoPricePerFm(holzart, qualitaet) {
-            // Sucht den Preis in der statischen Preisliste (BRUTTO)
-            const price = PREISLISTE[holzart] ? PREISLISTE[holzart][qualitaet] : 0.00;
-            return price;
+        function calculateFestmeter(durchmesser, laenge) {
+            // Nur gültige Zahlen verwenden
+            if (isNaN(durchmesser) || isNaN(laenge) || durchmesser <= 0 || laenge <= 0) {
+                return 0;
+            }
+            // Durchmesser in Dezimeter (dm) umrechnen: d/10. FM = (d/10)^2 * PI/4 * L
+            // Hier verwenden wir d in cm -> m (d/100)
+            const dInMeters = durchmesser / 100;
+            const festmeter = Math.pow(dInMeters, 2) * Math.PI / 4 * laenge;
+            // Auf 4 Nachkommastellen runden
+            return Math.round(festmeter * 10000) / 10000;
+        }
+        
+        /**
+         * Gibt die passenden Tailwind-Klassen für den Kundenstatus zurück.
+         * @param {string} status - Der Status (z.B. "Aktiv", "Neu")
+         * @returns {string} Tailwind-Klassen für den Badge
+         */
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'Aktiv':
+                    return 'status-badge aktiv';
+                case 'Neu':
+                    return 'status-badge neu';
+                case 'In Bearbeitung':
+                    return 'status-badge in_bearbeitung';
+                case 'Inaktiv':
+                default:
+                    return 'status-badge inaktiv';
+            }
         }
 
-        /**
-         * Berechnet den NETTO-Preis und den MWST-Betrag aus einem gegebenen Brutto-Preis.
-         * @param {number} bruttoPrice - Der Brutto-Preis (inkl. 13% MwSt.).
-         * @returns {{netto: number, mwst: number}}
-         */
-        function calculateNettoAndMwst(bruttoPrice) {
-            const nettoPrice = bruttoPrice * MWST_FAKTOR_BRUTTO_ZU_NETTO;
-            const mwstAmount = bruttoPrice - nettoPrice;
-            return { netto: nettoPrice, mwst: mwstAmount };
-        }
+        // --- RENDERING-FUNKTIONEN ---
 
         /**
-         * Berechnet den Gesamtpreis (Brutto, Netto, MwSt.) eines Stammes.
-         * @param {number} festmeter - Das Volumen des Stammes in fm.
-         * @param {string} holzart - Die Holzart.
-         * @param {string} qualitaet - Die Qualität.
-         * @returns {{brutto: number, netto: number, mwst: number}}
+         * Füllt das Kunden-Dropdown beim Initialisieren.
          */
-        function calculateTotalPrice(festmeter, holzart, qualitaet) {
-            const bruttoPricePerFm = getBruttoPricePerFm(holzart, qualitaet);
-            const totalBruttoPrice = festmeter * bruttoPricePerFm;
+        function populateCustomerDropdown() {
+            const customerSelect = document.getElementById('kunde');
+            const customers = loadCustomers(); 
             
-            const { netto, mwst } = calculateNettoAndMwst(totalBruttoPrice);
+            // Bestehende Optionen entfernen (außer der ersten Placeholder-Option)
+            while (customerSelect.options.length > 1) {
+                customerSelect.remove(1);
+            }
 
-            return { 
-                brutto: totalBruttoPrice, 
-                netto: netto, 
-                mwst: mwst 
-            };
+            customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id; // Speichert die ID des Kunden
+                option.textContent = customer.name;
+                customerSelect.appendChild(option);
+            });
         }
-
-
+        
         /**
-         * Klassifiziert das Holz basierend auf dem Mitteldurchmesser in cm.
+         * Aktualisiert das Status-Badge basierend auf dem ausgewählten Kunden.
          */
-        function getClassification(diameter) {
-            if (diameter >= 25) {
-                return '2b+';
-            } else if (diameter >= 20) {
-                return '2a';
-            } else if (diameter >= 15) {
-                return '1b';
+        function updateCustomerStatusDisplay() {
+            const customerSelect = document.getElementById('kunde');
+            const badgeContainer = document.getElementById('customer-status-badge');
+            const selectedCustomerId = customerSelect.value;
+            
+            // Wenn kein Kunde ausgewählt ist, Badge leeren
+            if (!selectedCustomerId || selectedCustomerId === "") {
+                badgeContainer.innerHTML = '';
+                return;
+            }
+            
+            const customers = loadCustomers();
+            const selectedCustomer = customers.find(c => c.id === parseInt(selectedCustomerId));
+
+            if (selectedCustomer) {
+                const status = selectedCustomer.status;
+                const statusClass = getStatusBadgeClass(status);
+                badgeContainer.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs font-bold text-gray-700">Status:</span>
+                        <span class="${statusClass}">
+                            ${status}
+                        </span>
+                    </div>
+                `;
             } else {
-                return 'UNKLAR';
+                badgeContainer.innerHTML = '';
             }
         }
 
 
-        // Funktion zur Aktualisierung der Tabelle und der Gesamtmenge
+        /**
+         * Rendert die Liste der erfassten Stämme in der Tabelle.
+         */
         function renderTable() {
             const tbody = document.getElementById('wood-table-body');
-            const totalVolumeElement = document.getElementById('total-volume');
             tbody.innerHTML = '';
-            let totalVolume = 0;
+            
+            const totalStammeElement = document.getElementById('total-stamme');
+            totalStammeElement.textContent = woodEntries.length;
 
-            // Die Tabelle hat jetzt 8 Spalten (7 Daten + 1 Aktion)
             if (woodEntries.length === 0) {
                  const row = tbody.insertRow();
-                 row.innerHTML = `<td colspan="8" class="px-3 py-4 whitespace-nowrap text-center text-sm text-gray-500 italic bg-white">Noch keine Stämme erfasst.</td>`;
+                 row.innerHTML = `<td colspan="7" class="px-3 py-4 text-center text-xs text-gray-500 italic bg-white">Noch keine Stämme erfasst.</td>`;
+                 updateTotals(); // Aktualisiert die Gesamtwerte auch bei leerer Liste
+                 return;
             }
 
             woodEntries.forEach((entry, index) => {
                 const row = tbody.insertRow();
-                row.className = 'hover:bg-blue-50 transition duration-100';
+                row.className = 'hover:bg-teal-50 transition duration-100';
 
-                // Füllt die Zeilen mit Daten
-                row.insertCell().textContent = entry.kunde;
-                row.insertCell().textContent = entry.holzart;
-                row.insertCell().textContent = entry.qualitaet; 
-
-                // Länge (rechtsbündig)
-                const lengthCell = row.insertCell();
-                lengthCell.textContent = parseFloat(entry.laenge).toFixed(2);
-                lengthCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-right';
+                // 1. Laufende Nummer
+                row.insertCell().textContent = index + 1;
                 
-                // Mitteldurchmesser (rechtsbündig)
-                const diameterCell = row.insertCell();
-                diameterCell.textContent = parseFloat(entry.durchmesser).toFixed(1);
-                diameterCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-right';
+                // 2. Baumart/Güte
+                row.insertCell().textContent = entry.baumart;
                 
-                // Klassifizierung (zentriert)
-                const classCell = row.insertCell();
-                classCell.textContent = entry.classification;
-                classCell.className = 'px-3 py-2 whitespace-nowrap text-sm text-gray-900 text-center font-semibold';
-
-
-                // Festmeter (rechtsbündig und hervorgehoben)
-                const volumeCell = row.insertCell();
-                volumeCell.textContent = entry.festmeter.toFixed(3);
-                volumeCell.className = 'px-3 py-2 whitespace-nowrap text-sm font-bold text-blue-700 bg-blue-100 text-right';
+                // 3. Länge (m)
+                const laengeCell = row.insertCell();
+                laengeCell.className = 'text-right';
+                laengeCell.textContent = entry.laenge.toFixed(2);
                 
-                // Aktionen
+                // 4. Durchmesser (cm)
+                const durchmesserCell = row.insertCell();
+                durchmesserCell.className = 'text-right';
+                durchmesserCell.textContent = entry.durchmesser;
+                
+                // 5. Festmeter (FM)
+                const fmCell = row.insertCell();
+                fmCell.className = 'text-right font-bold text-teal-700';
+                fmCell.textContent = entry.festmeter.toFixed(4);
+                
+                // 6. Notizen
+                row.insertCell().textContent = entry.notizen;
+
+                // 7. Aktionen
                 const actionsCell = row.insertCell();
-                actionsCell.className = 'px-3 py-2 whitespace-nowrap text-right';
+                actionsCell.className = 'text-right whitespace-nowrap space-x-2';
                 actionsCell.innerHTML = `
-                    <button onclick="window.editEntry(${entry.id})" class="text-blue-600 hover:text-blue-900 text-sm font-medium mr-2 transition duration-150">Ändern</button>
-                    <button onclick="window.confirmDelete(${entry.id})" class="text-red-600 hover:text-red-900 text-sm font-medium transition duration-150">Löschen</button>
+                    <button onclick="window.editEntry(${entry.id})" class="text-blue-600 hover:text-blue-800 text-xs font-semibold transition duration-150 transform hover:scale-105">Bearbeiten</button>
+                    <button onclick="window.deleteEntry(${entry.id})" class="text-red-600 hover:text-red-800 text-xs font-semibold transition duration-150 transform hover:scale-105">Löschen</button>
                 `;
-
-
-                totalVolume += entry.festmeter;
-            });
-
-            totalVolumeElement.textContent = `${totalVolume.toFixed(3)} fm`;
-        }
-        
-        // --- MODAL FUNKTIONEN (ersetzt prompt/confirm) ---
-
-        /**
-         * Zeigt das Bestätigungs-Modal an.
-         */
-        window.showConfirmation = function(title, message, onConfirmAction, param = null, confirmText = 'Bestätigen') {
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-message').textContent = message;
-            document.getElementById('modal-confirm-button').textContent = confirmText;
-            
-            // Setzt die Farbe des Bestätigungsbuttons je nach Aktion (Rot für Löschen/Verlust, Blau für Archivieren)
-            const confirmButton = document.getElementById('modal-confirm-button');
-            confirmButton.classList.remove('bg-red-600', 'hover:bg-red-700', 'bg-blue-600', 'hover:bg-blue-700');
-
-            if (confirmText.includes('Löschen') || confirmText.includes('endgültig')) {
-                 confirmButton.classList.add('bg-red-600', 'hover:bg-red-700');
-            } else {
-                 confirmButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
-            }
-
-            document.getElementById('confirmation-modal').classList.remove('hidden');
-            actionOnConfirm = onConfirmAction;
-            actionParam = param;
-        }
-        
-        /**
-         * Versteckt das Bestätigungs-Modal und führt die Aktion aus (falls bestätigt).
-         */
-        window.hideConfirmation = function(confirmed) {
-            document.getElementById('confirmation-modal').classList.add('hidden');
-            if (confirmed && actionOnConfirm) {
-                actionOnConfirm(actionParam);
-            }
-            // Variablen zurücksetzen
-            actionOnConfirm = null;
-            actionParam = null;
-        }
-        
-        // --- LÖSCH-Logik mit Modal ---
-
-        window.confirmDelete = function(id) {
-            window.showConfirmation(
-                'Stamm löschen', 
-                'Sind Sie sicher, dass Sie diesen Stamm aus der Liste entfernen möchten?', 
-                window.deleteEntry, 
-                id,
-                'Ja, Löschen'
-            );
-        }
-
-        /**
-         * Löscht einen Eintrag anhand seiner ID und speichert die Liste.
-         */
-        window.deleteEntry = function(id) {
-            woodEntries = woodEntries.filter(e => e.id !== id);
-            saveEntries();
-            renderTable();
-            
-            // Feedback anzeigen
-            const feedback = document.getElementById('feedback-message');
-            feedback.textContent = 'Stamm erfolgreich gelöscht!';
-            feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
-            feedback.classList.remove('hidden');
-            setTimeout(() => feedback.classList.add('hidden'), 3000);
-        }
-
-
-        // --- ARCHIVIERUNGS-Logik mit Modal (HIER IST DER FIX WICHTIG) ---
-
-        window.confirmArchive = function() {
-            if (woodEntries.length === 0) {
-                const feedback = document.getElementById('feedback-message');
-                feedback.textContent = 'Es gibt keine Stämme zum Archivieren.';
-                feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
-                feedback.classList.remove('hidden');
-                setTimeout(() => feedback.classList.add('hidden'), 3000);
-                return;
-            }
-            // Berechnung des Bruttopreises für die Anzeige im Modal
-            const totalBruttoPrice = woodEntries.reduce((sum, entry) => sum + entry.bruttoPrice, 0);
-            
-            // Wichtig: window.handleArchive als Callback übergeben
-            window.showConfirmation(
-                'Alle Stämme archivieren', 
-                `Wollen Sie wirklich alle ${woodEntries.length} erfassten Stämme (Gesamtpreis Brutto: ${totalBruttoPrice.toFixed(2)} €) archivieren und die Liste leeren? Die Daten sind danach im Archiv einsehbar.`, 
-                window.handleArchive, 
-                null,
-                'Ja, archivieren'
-            );
-        }
-        
-        /**
-         * Archiviert die aktuelle Liste, speichert sie mit einem Zeitstempel und leert die aktuelle Liste.
-         */
-        window.handleArchive = function() {
-            const currentEntries = woodEntries;
-            
-            // Lade das Archiv (oder leeres Array)
-            const archivedEntries = JSON.parse(localStorage.getItem('archivedEntries')) || [];
-            
-            // Korrigiert den Fehler: Kombination von dateStyle und timeStyle in toLocaleDateString ist ungültig.
-            // Verwenden stattdessen toLocaleString mit expliziten Optionen für Datum und Uhrzeit.
-            const timestamp = new Date().toLocaleString('de-DE', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit' 
             });
             
-            const totalVolume = currentEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
-            const totalNettoPrice = currentEntries.reduce((sum, entry) => sum + entry.nettoPrice, 0);
-            const totalBruttoPrice = currentEntries.reduce((sum, entry) => sum + entry.bruttoPrice, 0);
-            const totalMwstAmount = currentEntries.reduce((sum, entry) => sum + entry.mwstAmount, 0);
+            // Aktualisiert die Gesamtwerte
+            updateTotals();
+        }
 
+        /**
+         * Aktualisiert die Gesamt-Festmeter und den Gesamtpreis in der Dashboard-Karte.
+         */
+        function updateTotals() {
+            const totalFestmeter = woodEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
+            const totalPrice = woodEntries.reduce((sum, entry) => sum + entry.preis, 0);
 
-            const archiveSession = {
-                id: Date.now(), // Eindeutige ID für die Archiv-Sitzung
-                timestamp: timestamp,
-                totalVolume: totalVolume.toFixed(3),
-                totalNettoPrice: totalNettoPrice.toFixed(2), 
-                totalBruttoPrice: totalBruttoPrice.toFixed(2), 
-                totalMwstAmount: totalMwstAmount.toFixed(2), 
-                count: currentEntries.length,
-                entries: currentEntries // Speichere die tatsächlichen Daten
-            };
-            
-            // Füge die neue Sitzung vorne hinzu
-            archivedEntries.unshift(archiveSession); 
-            localStorage.setItem('archivedEntries', JSON.stringify(archivedEntries)); // WICHTIG: Speichert das Archiv
-            
-            // Leere die aktuelle Liste und speichere
-            woodEntries = [];
-            saveEntries();
-            renderTable();
-            
-            // Archivierungs-Erfolgsmeldung anzeigen
-            const feedback = document.getElementById('feedback-message');
-            feedback.textContent = `Liste erfolgreich archiviert (${archiveSession.count} Stämme, ${archiveSession.totalBruttoPrice} € Brutto) und geleert! Gehen Sie jetzt zum Archiv-Tab.`;
-            feedback.className = 'col-span-2 md:col-span-7 text-sm text-blue-600 font-semibold';
-            feedback.classList.remove('hidden');
-            setTimeout(() => feedback.classList.add('hidden'), 5000);
+            document.getElementById('total-cubic-meters').textContent = `${totalFestmeter.toFixed(2)} FM`;
+            document.getElementById('total-price').querySelector('span').textContent = formatCurrency(totalPrice);
         }
         
-        // --- LISTE LEEREN Logik mit Modal ---
-        
-        window.confirmClear = function() {
-             if (woodEntries.length === 0) {
-                const feedback = document.getElementById('feedback-message');
-                feedback.textContent = 'Die Liste ist bereits leer.';
-                feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
-                feedback.classList.remove('hidden');
-                setTimeout(() => feedback.classList.add('hidden'), 3000);
-                return;
-            }
-            window.showConfirmation(
-                'Liste endgültig leeren', 
-                'Sind Sie sicher, dass Sie alle Stämme OHNE Archivierung löschen möchten? Diese Daten gehen dann verloren und können NICHT wiederhergestellt werden!', 
-                window.handleClear, 
-                null,
-                'Ja, endgültig löschen'
-            );
-        }
-
         /**
-         * Löscht alle Einträge ohne Archivierung.
+         * Aktualisiert die Preisübersicht im rechten Dashboard-Panel.
          */
-        window.handleClear = function() {
-            woodEntries = [];
-            saveEntries();
-            renderTable();
+        function updatePriceDisplay() {
+            const priceListDiv = document.getElementById('price-list');
+            priceListDiv.innerHTML = '';
             
-            // Erfolgsmeldung anzeigen
-            const feedback = document.getElementById('feedback-message');
-            feedback.textContent = 'Liste erfolgreich geleert!';
-            feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
-            feedback.classList.remove('hidden');
-            setTimeout(() => feedback.classList.add('hidden'), 3000);
+            for (const [baumart, preis] of Object.entries(PRICE_LIST)) {
+                const item = document.createElement('div');
+                item.className = 'flex justify-between text-sm text-gray-800';
+                item.innerHTML = `
+                    <span class="font-medium">${baumart}:</span>
+                    <span class="font-semibold text-green-700">${formatCurrency(preis)} / FM</span>
+                `;
+                priceListDiv.appendChild(item);
+            }
         }
 
-        // --- PDF Generierung (MODERNISIERT) ---
+
+        // --- CRUD-AKTIONEN ---
 
         /**
-         * Erzeugt eine PDF-Datei (Gutschrift) mit Zusammenfassung und Stammliste im modernen Design.
+         * Setzt das Formular zurück und bereitet es für eine neue Eingabe vor.
          */
-        window.generatePDF = function() {
-            // Überprüft, ob Einträge vorhanden sind
-            if (woodEntries.length === 0) {
-                const feedback = document.getElementById('feedback-message');
-                feedback.textContent = 'Keine Einträge vorhanden, um eine Gutschrift zu erstellen.';
-                feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
-                feedback.classList.remove('hidden');
-                setTimeout(() => feedback.classList.add('hidden'), 4000);
-                return;
-            }
-
-            // Stellt sicher, dass die PDF-Bibliotheken geladen sind
-            if (typeof window.jspdf === 'undefined' || typeof window.jspdf.AcroForm === 'undefined') {
-                const feedback = document.getElementById('feedback-message');
-                feedback.textContent = 'Fehler: PDF-Bibliotheken nicht geladen. Versuchen Sie es erneut.';
-                feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
-                feedback.classList.remove('hidden');
-                setTimeout(() => feedback.classList.add('hidden'), 4000);
-                return;
-            }
+        function resetFormForNewEntry() {
+            const form = document.getElementById('wood-entry-form');
+            const submitButton = document.getElementById('submit-button');
+            const editingIdInput = document.getElementById('editing-id');
+            const kundeSelect = document.getElementById('kunde');
             
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const margin = 15;
-            let y = margin;
-            const today = new Date().toLocaleDateString('de-DE');
-            const mainCustomer = woodEntries[0].kunde || "Unbekannter Kunde"; // Hauptkunde
+            // Formular-Zustand für neue Eingabe vorbereiten
+            submitButton.textContent = 'Hinzufügen';
+            submitButton.classList.replace('bg-blue-600', 'bg-green-600');
+            submitButton.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            editingIdInput.value = '';
 
-            // --- 1. HEADER / BRANDING (Modernisiert) ---
+            // Alle Felder leeren, außer dem Kunden, Baumart und Länge (für schnelle sequentielle Eingabe)
+            const originalKunde = kundeSelect.value;
+            const originalBaumart = document.getElementById('baumart').value;
+            const originalLaenge = document.getElementById('laenge').value;
             
-            // Hintergrund für den Header (Lichtes Indigo)
-            doc.setFillColor(219, 234, 254); // Tailwind Blue-200
-            doc.rect(0, 0, doc.internal.pageSize.width, 30, 'F');
-            
-            // Firmenname (Sägewerk Mülleder)
-            doc.setFontSize(28);
-            doc.setFont('Helvetica', 'Bold');
-            doc.setTextColor(30, 64, 175); // Dunkles Blau
-            doc.text("Sägewerk Mülleder", margin, 21);
-            
-            y = 40; // Startpunkt nach dem Header
+            form.reset();
 
-            // --- 2. DOKUMENTINFORMATIONEN ---
-            
-            doc.setFontSize(20);
-            doc.setFont('Helvetica', 'Bold');
-            doc.setTextColor(17, 24, 39); // Dunkelgrau
-            doc.text("Gutschrift", margin, y);
-            y += 10;
-
-            doc.setFontSize(12);
-            doc.setFont('Helvetica', 'Normal');
-            doc.setTextColor(75, 85, 99); // Standardgrau
-            doc.text(`Datum: ${today}`, doc.internal.pageSize.width - margin, y, { align: 'right' });
-            
-            doc.setFontSize(14);
-            doc.setFont('Helvetica', 'Bold');
-            doc.setTextColor(31, 41, 55); // Mittleres Grau
-            doc.text(`Kunde: ${mainCustomer}`, margin, y);
-            y += 12; 
-
-            // Trennlinie
-            doc.setDrawColor(30, 64, 175); // Dunkles Blau
-            doc.setLineWidth(1);
-            doc.line(margin, y, doc.internal.pageSize.width - margin, y);
-            y += 10;
-            
-            // --- 3. VOLUMEN- UND PREIS-ZUSAMMENFASSUNG ---
-            
-            doc.setFontSize(16);
-            doc.setFont('Helvetica', 'Bold');
-            doc.setTextColor(31, 41, 55);
-            doc.text("1. Gesamtübersicht nach Klassifizierung", margin, y);
-            y += 5;
-
-            // Berechnet die Summe pro Klassifizierung
-            const summary = woodEntries.reduce((acc, entry) => {
-                const key = entry.classification;
-                // Wichtig: entry.mwstAmount ist jetzt im Objekt gespeichert
-                acc[key] = {
-                    volume: (acc[key]?.volume || 0) + entry.festmeter,
-                    netto: (acc[key]?.netto || 0) + entry.nettoPrice,
-                    brutto: (acc[key]?.brutto || 0) + entry.bruttoPrice,
-                    mwst: (acc[key]?.mwst || 0) + entry.mwstAmount 
-                };
-                return acc;
-            }, {});
-            
-            // Bereitet die Daten für die Zusammenfassungstabelle vor und sortiert sie
-            const summaryTableData = Object.entries(summary)
-                .map(([classification, data]) => [
-                    classification,
-                    data.volume.toFixed(3) + ' fm',
-                    data.netto.toFixed(2) + ' €', // Netto
-                    data.mwst.toFixed(2) + ' €',  // MwSt.
-                    data.brutto.toFixed(2) + ' €' // Brutto
-                ])
-                .sort((a, b) => a[0].localeCompare(b[0])); 
-
-            const totalVolume = woodEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
-            const totalNettoPrice = woodEntries.reduce((sum, entry) => sum + entry.nettoPrice, 0);
-            const totalBruttoPrice = woodEntries.reduce((sum, entry) => sum + entry.bruttoPrice, 0);
-            const totalMwstAmount = woodEntries.reduce((sum, entry) => sum + entry.mwstAmount, 0);
-
-            doc.autoTable({
-                startY: y,
-                head: [['Klassifizierung', 'Volumen', 'Gesamtpreis Netto', 'MwSt. (13%)', 'Gesamtpreis Brutto']],
-                body: summaryTableData,
-                foot: [['Gesamt', totalVolume.toFixed(3) + ' fm', totalNettoPrice.toFixed(2) + ' €', totalMwstAmount.toFixed(2) + ' €', totalBruttoPrice.toFixed(2) + ' €']],
-                theme: 'grid', 
-                styles: { fontSize: 11, cellPadding: 3, textColor: [55, 65, 81] },
-                headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' }, // Tailwind Indigo-600
-                footStyles: { fillColor: [224, 231, 255], fontStyle: 'bold', textColor: [0, 0, 0] }, // Tailwind Indigo-200
-                columnStyles: { 
-                    1: { halign: 'right' }, // Volumen 
-                    2: { halign: 'right' }, // Netto 
-                    3: { halign: 'right' }, // MwSt.
-                    4: { halign: 'right' }  // Brutto
-                } 
-            });
-
-            y = doc.autoTable.previous.finalY + 15;
-
-            // --- 4. DETAILLIERTE STAMMLISTE ---
-            
-            doc.setFontSize(16);
-            doc.setFont('Helvetica', 'Bold');
-            doc.setTextColor(31, 41, 55);
-            doc.text("2. Detaillierte Stammliste", margin, y);
-            y += 5;
-            
-            const detailTableHead = [
-                'Lfd. Nr.', 
-                'Holzart', 
-                'Qualität', 
-                'Länge (m)', 
-                'Ø (cm)', 
-                'Klass.', 
-                'Festmeter (fm)',
-                'Netto (€)', // Netto-Spalte in PDF beibehalten
-                'Brutto (€)' // Brutto-Spalte in PDF beibehalten
-            ];
-            
-            // Filtere Kunde heraus, da er bereits im Header steht, außer für die lfd. Nr.
-            const detailTableBody = woodEntries.map((entry, index) => [
-                index + 1, // Lfd. Nummer
-                entry.holzart,
-                entry.qualitaet,
-                entry.laenge.toFixed(2),
-                entry.durchmesser.toFixed(1),
-                entry.classification,
-                entry.festmeter.toFixed(3),
-                entry.nettoPrice.toFixed(2), 
-                entry.bruttoPrice.toFixed(2) 
-            ]);
-
-            doc.autoTable({
-                startY: y,
-                head: [detailTableHead],
-                body: detailTableBody,
-                theme: 'striped', // Streifen für bessere Lesbarkeit
-                styles: { fontSize: 9, cellPadding: 2, textColor: [55, 65, 81] },
-                headStyles: { fillColor: [55, 65, 81], textColor: [255, 255, 255], fontStyle: 'bold' }, // Dunkelgrau 
-                columnStyles: { 
-                    3: { halign: 'right' }, // Länge
-                    4: { halign: 'right' }, // Durchmesser
-                    6: { halign: 'right', fontStyle: 'bold' }, // Festmeter
-                    7: { halign: 'right' }, // Netto
-                    8: { halign: 'right', fontStyle: 'bold' } // Brutto
-                },
-                didDrawPage: (data) => {
-                    // Footer für Seitennummerierung
-                    doc.setFontSize(8);
-                    doc.setFont('Helvetica', 'Italic');
-                    doc.setTextColor(156, 163, 175);
-                    doc.text(`Sägewerk Mülleder - Seite ${doc.internal.getNumberOfPages()}`, doc.internal.pageSize.width - margin, doc.internal.pageSize.height - 5, { align: 'right' });
-                }
-            });
-
-            // Speichern der PDF
-            doc.save(`Gutschrift_Sägewerk_Mülleder_${new Date().toISOString().slice(0, 10)}.pdf`);
+            // Werte wiederherstellen
+            kundeSelect.value = originalKunde;
+            document.getElementById('baumart').value = originalBaumart;
+            document.getElementById('laenge').value = originalLaenge;
+            updateCustomerStatusDisplay(); // Stellt sicher, dass das Badge aktuell ist
         }
 
         /**
-         * Lädt die Daten eines Eintrags in das Formular zum Bearbeiten.
+         * Bearbeitet einen ausgewählten Stamm.
          */
         window.editEntry = function(id) {
             const entryToEdit = woodEntries.find(e => e.id === id);
             if (entryToEdit) {
                 // Formularfelder füllen
-                document.getElementById('kunde').value = entryToEdit.kunde;
-                document.getElementById('holzart').value = entryToEdit.holzart;
-                document.getElementById('qualitaet').value = entryToEdit.qualitaet; 
+                document.getElementById('kunde').value = entryToEdit.kundeId;
+                document.getElementById('baumart').value = entryToEdit.baumart;
                 document.getElementById('laenge').value = entryToEdit.laenge;
                 document.getElementById('durchmesser').value = entryToEdit.durchmesser;
+                document.getElementById('notizen').value = entryToEdit.notizen;
 
-                // Preis-Anzeige aktualisieren
-                document.getElementById('calculated-price-netto').textContent = `${entryToEdit.nettoPrice.toFixed(2)} €`;
-                document.getElementById('calculated-price-brutto').textContent = `${entryToEdit.bruttoPrice.toFixed(2)} €`;
-
-                // ID des Eintrags speichern, um beim Speichern den richtigen Eintrag zu aktualisieren
+                // Versteckte ID setzen
                 document.getElementById('editing-id').value = id;
 
-                // Schaltfläche auf Bearbeitungsmodus umstellen
-                saveButton.textContent = 'Änderungen speichern';
-                saveButton.classList.remove('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
-                saveButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:ring-blue-500');
-
+                // Button-Text und Farbe ändern
+                const submitButton = document.getElementById('submit-button');
+                submitButton.textContent = 'Speichern & Korrigieren';
+                submitButton.classList.replace('bg-green-600', 'bg-blue-600');
+                submitButton.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                
+                // Status-Badge aktualisieren
+                updateCustomerStatusDisplay();
+                
                 document.getElementById('kunde').focus();
             }
         }
 
         /**
-         * Setzt das Formular in den Standardmodus (Neuer Eintrag).
+         * Löscht einen Stamm.
          */
-        function resetFormForNewEntry() {
-            document.getElementById('editing-id').value = '';
+        window.deleteEntry = function(id) {
+            const originalLength = woodEntries.length;
+            woodEntries = woodEntries.filter(e => e.id !== id);
             
-            // Schaltfläche zurücksetzen
-            saveButton.textContent = 'Stamm speichern (oder Enter in Ø)';
-            saveButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'focus:ring-blue-500');
-            saveButton.classList.add('bg-green-600', 'hover:bg-green-700', 'focus:ring-green-500');
+            if (woodEntries.length < originalLength) {
+                saveEntries();
+                renderTable();
+                
+                const feedback = document.getElementById('feedback-message');
+                feedback.textContent = 'Stamm erfolgreich entfernt.';
+                feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+            }
         }
 
-        /**
-         * NEU: Logout-Funktion. Löscht den Anmelde-Flag und lädt die Seite neu.
-         */
-        window.logout = function() {
-            sessionStorage.removeItem('isLoggedIn');
-            window.location.reload(); 
-        }
+        // --- PDF EXPORT LOGIK ---
 
-        /**
-         * Zeigt den Haupt-App-Container an und blendet den Login-Screen aus.
-         */
-        function showApp() {
-            const loginScreen = document.getElementById('login-screen');
-            const appContainer = document.getElementById('app-container');
+        function exportToPDF() {
+            if (woodEntries.length === 0) {
+                alert('Die Liste ist leer. Bitte erfassen Sie zuerst Stämme.');
+                return;
+            }
+
+            // Sicherstellen, dass die jsPDF-Bibliothek verfügbar ist
+            if (typeof window.jsPDF === 'undefined' || typeof window.jspdf.jsPDF === 'undefined' || typeof window.jspdf.jsPDF.autoTable === 'undefined') {
+                 // Fallback für die jsPDF-Versionierung (wird normalerweise von den Skript-Tags geladen)
+                 const jsPDF = window.jsPDF.jsPDF || window.jspdf.jsPDF;
+                 if (typeof jsPDF === 'undefined') {
+                    alert('PDF-Bibliothek nicht geladen. Bitte versuchen Sie es erneut.');
+                    return;
+                 }
+            }
             
-            // Login-Screen ausblenden und Hauptinhalt einblenden
-            loginScreen.classList.add('hidden');
-            appContainer.classList.remove('hidden');
-            appContainer.style.opacity = '1';
+            const { jsPDF } = window.jspdf; // Korrekte Initialisierung
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const customers = loadCustomers();
+            const selectedCustomerId = document.getElementById('kunde').value;
+            const customer = customers.find(c => c.id === parseInt(selectedCustomerId)) || { name: "Unbekannter Kunde", strasse: "N/A", plz: "N/A", ort: "N/A" };
+
+            let y = 10;
+            const margin = 15;
+            const lineHeight = 7;
+            const cellHeight = 10;
+            const tableStartY = 50; 
+            
+            // 1. Titel
+            doc.setFontSize(18);
+            doc.setTextColor(30, 144, 255); // Deep Sky Blue
+            doc.text("Lieferschein / Holzliste", margin, y);
+            y += lineHeight;
+
+            // 2. Kundeninformationen
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50); // Dunkelgrau
+            doc.text("Sägewerk Mülleder", margin, y);
+            doc.text("Datum: " + new Date().toLocaleDateString('de-DE'), 195, y, { align: "right" });
+            y += lineHeight;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text("Lieferung an:", margin, y);
+            y += lineHeight;
+            
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            doc.text(`Kunde: ${customer.name}`, margin, y); y += lineHeight - 2;
+            doc.text(`Adresse: ${customer.strasse}, ${customer.plz} ${customer.ort}`, margin, y); y += lineHeight + 2;
+
+            // 3. Tabellenkopf und Daten vorbereiten
+            const headers = [
+                ['Lauf. Nr.', 'Baumart/Güte', 'Länge (m)', 'Durchmesser (cm)', 'Festmeter (FM)', 'Einzelpreis (€/FM)', 'Gesamtpreis (€)', 'Notizen']
+            ];
+            
+            const data = woodEntries.map((entry, index) => [
+                index + 1,
+                entry.baumart,
+                entry.laenge.toFixed(2),
+                entry.durchmesser,
+                entry.festmeter.toFixed(4),
+                formatCurrency(PRICE_LIST[entry.baumart] || 0),
+                formatCurrency(entry.preis),
+                entry.notizen
+            ]);
+            
+            const totalFestmeter = woodEntries.reduce((sum, entry) => sum + entry.festmeter, 0);
+            const totalPrice = woodEntries.reduce((sum, entry) => sum + entry.preis, 0);
+
+            // 4. PDF AutoTable Generation
+            doc.autoTable({
+                head: headers,
+                body: data,
+                startY: tableStartY,
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [6, 182, 212], // Teal-500
+                    textColor: 255, 
+                    fontSize: 8, 
+                    halign: 'center' 
+                },
+                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'right' }, // Lauf. Nr.
+                    2: { halign: 'right' }, // Länge
+                    3: { halign: 'right' }, // Durchmesser
+                    4: { halign: 'right', fontStyle: 'bold' }, // FM
+                    5: { halign: 'right' }, // Einzelpreis
+                    6: { halign: 'right', fontStyle: 'bold' }, // Gesamtpreis
+                    7: { cellWidth: 35 } // Notizen
+                },
+                didDrawPage: function(data) {
+                    // Fußzeile auf jeder Seite
+                    doc.setFontSize(8);
+                    doc.text("Seite " + doc.internal.getNumberOfPages(), data.settings.margin.left, doc.internal.pageSize.height - 5);
+                }
+            });
+
+            // 5. Fußzeile / Zusammenfassung
+            const finalY = doc.autoTable.previous.finalY + 10;
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            
+            doc.text("ZUSAMMENFASSUNG DER LIEFERUNG", margin, finalY);
+            doc.setFontSize(10);
+            doc.setTextColor(50, 50, 50);
+            
+            let summaryY = finalY + lineHeight;
+            doc.text(`Gesamtzahl Stämme: ${woodEntries.length}`, margin, summaryY); 
+            summaryY += lineHeight;
+            doc.setFontSize(14);
+            doc.setTextColor(6, 182, 212); // Teal-500
+            doc.text(`Gesamtes Volumen: ${totalFestmeter.toFixed(2)} FM`, margin, summaryY);
+            doc.setTextColor(34, 139, 34); // Forest Green
+            doc.text(`Gesamtwert: ${formatCurrency(totalPrice)}`, 195, summaryY, { align: "right" });
+            
+            // 6. Speichern
+            const filename = `Holzliste_${customer.name.replace(/\s/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
+            doc.save(filename);
         }
 
+        // --- EVENT HANDLER ---
+
+        // 1. Initialisierung beim Laden der Seite
         document.addEventListener('DOMContentLoaded', () => {
+            loadEntries(); // Lädt die gespeicherte Liste
+            populateCustomerDropdown(); // Lädt die Kunden in das Dropdown
+            updateCustomerStatusDisplay(); // Zeigt den Status an (falls ein Kunde voreingestellt ist)
+            renderTable(); // Rendert die Tabelle
+            updatePriceDisplay(); // Zeigt die Preisliste an
             
-            const loginScreen = document.getElementById('login-screen');
-            const loginForm = document.getElementById('login-form');
-            const errorMessage = document.getElementById('error-message');
+            // Setzt den Fokus auf das erste Eingabefeld (Kunde)
+            document.getElementById('kunde').focus(); 
+        });
+        
+        // 2. Event-Listener für Kunden-Dropdown
+        document.getElementById('kunde').addEventListener('change', updateCustomerStatusDisplay);
+
+        // 3. Event-Listener für den PDF-Export
+        document.getElementById('export-pdf-button').addEventListener('click', exportToPDF);
+        
+        // 4. Event-Listener für "Liste leeren" (öffnet Modal)
+        document.getElementById('clear-list-button').addEventListener('click', () => {
+            if (woodEntries.length === 0) {
+                const feedback = document.getElementById('feedback-message');
+                feedback.textContent = 'Die Liste ist bereits leer!';
+                feedback.className = 'col-span-2 md:col-span-7 text-sm text-yellow-600 font-semibold';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                return;
+            }
+            document.getElementById('modal-count').textContent = woodEntries.length;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        });
+
+        // 5. Modal-Abbrechen
+        document.getElementById('modal-cancel').addEventListener('click', () => {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        });
+
+        // 6. Modal-Bestätigen (Liste wirklich löschen)
+        document.getElementById('modal-confirm').addEventListener('click', () => {
+            woodEntries = []; // Leert die Liste
+            saveEntries(); // Speichert den leeren Stand
+            renderTable(); // Aktualisiert die Tabelle
+            resetFormForNewEntry(); // Setzt das Formular zurück
             
+            document.getElementById('confirm-modal').classList.add('hidden');
+            
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = 'Liste erfolgreich gelöscht und auf Null zurückgesetzt!';
+            feedback.className = 'col-span-2 md:col-span-7 text-sm text-green-600 font-semibold';
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 4000);
+        });
+        
+        // 7. Event-Listener für den Archivieren-Button (aktuelle Liste löschen, aber Kunden beibehalten)
+        document.getElementById('save-to-archive-button').addEventListener('click', () => {
+            // Hinweis: Da keine Archiv-Datenbank/Struktur existiert, simulieren wir nur das "Archivieren" 
+            // durch das Löschen der aktuellen Liste (wie beim "Liste leeren"-Button).
+            // In einer echten App würde man die Liste hier in eine "Archiv-Collection" in Firestore verschieben.
+            if (woodEntries.length === 0) {
+                const feedback = document.getElementById('feedback-message');
+                feedback.textContent = 'Die Liste ist leer. Es gibt nichts zu archivieren!';
+                feedback.className = 'col-span-2 md:col-span-7 text-sm text-yellow-600 font-semibold';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                return;
+            }
+
+            // Alternativ könnte man hier direkt den PDF-Export triggern und danach löschen:
+            exportToPDF();
+
+            woodEntries = []; // Leert die Liste
+            saveEntries(); // Speichert den leeren Stand
+            renderTable(); // Aktualisiert die Tabelle
+            resetFormForNewEntry(); // Setzt das Formular zurück
+            
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = 'Liste wurde archiviert (PDF erstellt) und zurückgesetzt!';
+            feedback.className = 'col-span-2 md:col-span-7 text-sm text-green-600 font-semibold';
+            feedback.classList.remove('hidden');
+            setTimeout(() => feedback.classList.add('hidden'), 5000);
+        });
+
+
+        // 8. Formular-Submit-Handler (Hinzufügen & Bearbeiten)
+        document.getElementById('wood-entry-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const kundeSelect = document.getElementById('kunde');
             const laengeInput = document.getElementById('laenge');
             const durchmesserInput = document.getElementById('durchmesser');
-            const holzartInput = document.getElementById('holzart');
-            const qualitaetInput = document.getElementById('qualitaet');
-            const form = document.getElementById('wood-entry-form');
-            const feedback = document.getElementById('feedback-message');
             const editingIdInput = document.getElementById('editing-id');
-            const calculatedPriceNettoDisplay = document.getElementById('calculated-price-netto');
-            const calculatedPriceBruttoDisplay = document.getElementById('calculated-price-brutto');
-
-
-            // --- 1. SESSION-CHECK BEIM LADEN DER SEITE (FÜR ALLE SEITEN WICHTIG!) ---
-            if (sessionStorage.getItem('isLoggedIn') === 'true') {
-                showApp();
-                document.getElementById('kunde').focus(); // Fokus auf das erste Eingabefeld
-                renderTable(); // Tabelle rendern, falls Daten vorhanden
-                updatePriceDisplay(); // Preis-Anzeige aktualisieren
-            } else {
-                // Wenn nicht eingeloggt, Anmeldeschirm anzeigen und Fokus setzen
-                loginScreen.style.opacity = '1';
-                document.getElementById('username').focus();
-            }
-
-            // --- 2. AUTHENTIFIZIERUNGS-LOGIK ---
-
-            if (loginForm) {
-                loginForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const usernameInput = document.getElementById('username').value;
-                    const passwordInput = document.getElementById('password').value;
-
-                    // Die festen Anmeldedaten
-                    const correctUsername = 'admin';
-                    const correctPassword = 'admin';
-
-                    if (usernameInput === correctUsername && passwordInput === correctPassword) {
-                        // Bei Erfolg: Flag setzen und App anzeigen
-                        sessionStorage.setItem('isLoggedIn', 'true');
-                        errorMessage.classList.add('hidden');
-                        
-                        // Optischer Übergang
-                        loginScreen.style.opacity = '0';
-                        setTimeout(() => {
-                            showApp();
-                            document.getElementById('kunde').focus();
-                            renderTable();
-                            updatePriceDisplay();
-                        }, 500); 
-
-                    } else {
-                        // Bei Fehler: Fehlermeldung anzeigen und Passwortfeld leeren
-                        errorMessage.classList.remove('hidden');
-                        document.getElementById('password').value = '';
-                    }
-                });
-            }
-
-            // --- 3. BESTEHENDE APP-LOGIK (NUR AUSFÜHREN, WENN EINGELOGGT) ---
+            const feedback = document.getElementById('feedback-message');
             
-            /**
-             * Berechnet Volumen und Preis (Netto/Brutto) und aktualisiert die Preisanzeige im Formular.
-             */
-            function updatePriceDisplay() {
-                const laenge = parseFloat(laengeInput.value);
-                const durchmesser = parseFloat(durchmesserInput.value);
-                const holzart = holzartInput.value;
-                const qualitaet = qualitaetInput.value;
+            const isEditing = !!editingIdInput.value; 
 
-                if (isNaN(laenge) || laenge <= 0 || isNaN(durchmesser) || durchmesser <= 0) {
-                    calculatedPriceNettoDisplay.textContent = '0.00 €';
-                    calculatedPriceBruttoDisplay.textContent = '0.00 €';
-                    return;
-                }
-
-                const festmeter = calculateVolume(laenge, durchmesser);
-                const { brutto, netto } = calculateTotalPrice(festmeter, holzart, qualitaet);
-                
-                calculatedPriceNettoDisplay.textContent = `${netto.toFixed(2)} €`;
-                calculatedPriceBruttoDisplay.textContent = `${brutto.toFixed(2)} €`;
+            // Validierung, dass ein Kunde ausgewählt ist
+            if (!kundeSelect.value) {
+                feedback.textContent = 'Bitte wählen Sie zuerst einen Kunden aus!';
+                feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
+                feedback.classList.remove('hidden');
+                setTimeout(() => feedback.classList.add('hidden'), 3000);
+                return;
             }
+            
+            const laenge = parseFloat(laengeInput.value);
+            const durchmesser = parseInt(durchmesserInput.value);
+            const baumart = form.baumart.value;
+            const festmeter = calculateFestmeter(durchmesser, laenge);
+            const preisProFM = PRICE_LIST[baumart] || 0;
+            const gesamtPreis = festmeter * preisProFM;
 
-            // Event-Listener für Eingaben, um den Preis dynamisch zu aktualisieren
-            const inputFields = [laengeInput, durchmesserInput, holzartInput, qualitaetInput];
-            inputFields.forEach(input => {
-                if (input) input.addEventListener('input', updatePriceDisplay);
-            });
+            // Speichert die Original-Länge, falls wir für die nächste Eingabe nur den Durchmesser ändern wollen
+            const originalLaenge = laengeInput.value; 
 
 
-            // 1. Enter-Sprung von LÄNGE zu MITTELDURCHMESSER
-            if (laengeInput) laengeInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && laengeInput.value) {
-                    e.preventDefault(); 
-                    durchmesserInput.focus();
-                }
-            });
+            const newEntry = {
+                kundeId: parseInt(kundeSelect.value), // Kunden-ID speichern
+                baumart: baumart,
+                laenge: laenge,
+                durchmesser: durchmesser,
+                notizen: form.notizen.value,
+                festmeter: festmeter,
+                preis: gesamtPreis
+            };
 
-            // 2. Enter-Sprung von MITTELDURCHMESSER löst SUBMIT aus und springt zurück
-            if (durchmesserInput) durchmesserInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); 
-                    form.dispatchEvent(new Event('submit', { cancelable: true })); 
-                }
-            });
 
-            // 3. Formular-Verarbeitung (Speicherung und Berechnung)
-            if (form) form.addEventListener('submit', (e) => {
-                e.preventDefault();
+            if (isEditing) {
+                // Bearbeitung
+                const id = parseInt(editingIdInput.value);
+                const index = woodEntries.findIndex(e => e.id === id);
                 
-                const laenge = parseFloat(laengeInput.value);
-                const durchmesser = parseFloat(durchmesserInput.value);
-                const holzart = holzartInput.value;
-                const qualitaet = qualitaetInput.value;
-
-                const isEditing = !!editingIdInput.value;
-
-                // Validierung
-                if (isNaN(laenge) || laenge <= 0 || isNaN(durchmesser) || durchmesser <= 0) {
-                    feedback.textContent = 'Fehler: Länge/Durchmesser fehlen oder sind ungültig!';
-                    feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
-                    feedback.classList.remove('hidden');
-                    setTimeout(() => feedback.classList.add('hidden'), 4000);
+                if (index !== -1) {
+                    woodEntries[index] = { ...newEntry, id: id };
+                    feedback.textContent = 'Eintrag erfolgreich korrigiert!';
                     
-                    if (isNaN(laenge) || laenge <= 0) laengeInput.focus();
-                    else durchmesserInput.focus();
-                    
-                    return; 
-                }
-
-                const festmeter = calculateVolume(laenge, durchmesser);
-                const classification = getClassification(durchmesser); 
-                const { brutto, netto, mwst } = calculateTotalPrice(festmeter, holzart, qualitaet); 
-
-                const newEntry = {
-                    kunde: document.getElementById('kunde').value || 'Unbekannt',
-                    holzart: holzart,
-                    qualitaet: qualitaet,
-                    laenge: laenge,
-                    durchmesser: durchmesser,
-                    festmeter: festmeter,
-                    classification: classification,
-                    bruttoPrice: brutto,
-                    nettoPrice: netto,
-                    mwstAmount: mwst
-                };
-                
-                let originalLaenge = laengeInput.value; 
-
-                if (isEditing) {
-                    // Bearbeiten
-                    const id = parseInt(editingIdInput.value);
-                    const index = woodEntries.findIndex(e => e.id === id);
-                    
-                    if (index !== -1) {
-                        woodEntries[index] = { ...newEntry, id: id };
-                        feedback.textContent = 'Eintrag erfolgreich aktualisiert!';
-                    }
-                    // Nach Bearbeitung Formular zurücksetzen, da es sich meist um einen einzelnen Korrekturvorgang handelt
+                    // Logik: Da es sich um einen einzelnen Korrekturvorgang handelt
                     resetFormForNewEntry(); 
                     
                     // Setzt den Fokus nach der Bearbeitung auf das Kundenfeld, um die Eingabesequenz neu zu starten
                     document.getElementById('kunde').focus();
                 } else {
-                    // Neuer Eintrag
-                    newEntry.id = Date.now(); 
-                    woodEntries.push(newEntry);
-                    feedback.textContent = 'Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!';
-                    
-                    // Logik: Länge beibehalten und Durchmesser zurücksetzen
-                    durchmesserInput.value = ''; // Durchmesser löschen
-                    laengeInput.value = originalLaenge; // Länge beibehalten
-                    durchmesserInput.focus(); // Fokus auf Durchmesser setzen
+                    // Sollte nicht passieren
+                    feedback.textContent = 'Fehler: Eintrag zum Bearbeiten nicht gefunden.';
+                    feedback.className = 'col-span-2 md:col-span-7 text-sm text-red-600 font-semibold';
+                    feedback.classList.remove('hidden');
+                    return; // Beendet die Funktion
                 }
-
-
-                // Speichern, Tabelle neu rendern
-                saveEntries();
-                renderTable();
-                updatePriceDisplay(); // Preis-Anzeige für nächste Eingabe aktualisieren
-
-                // Feedback anzeigen
-                feedback.className = 'col-span-2 md:col-span-7 text-sm text-green-600 font-semibold';
-                feedback.classList.remove('hidden');
+            } else {
+                // Neuer Eintrag
+                newEntry.id = Date.now(); 
+                woodEntries.push(newEntry);
+                feedback.textContent = 'Eintrag erfolgreich gespeichert und zur Tabelle hinzugefügt!';
                 
-                // Feedback nach 3 Sekunden ausblenden
-                setTimeout(() => feedback.classList.add('hidden'), 3000);
-            });
+                // Logik: Länge beibehalten und Durchmesser zurücksetzen
+                durchmesserInput.value = ''; // Durchmesser löschen
+                laengeInput.value = originalLaenge; // Länge beibehalten
+                durchmesserInput.focus(); // Fokus auf Durchmesser setzen
+            }
+
+
+            // Speichern, Tabelle neu rendern
+            saveEntries();
+            renderTable();
+            updatePriceDisplay(); // Preis-Anzeige für nächste Eingabe aktualisieren
+
+            // Feedback anzeigen
+            feedback.className = 'col-span-2 md:col-span-7 text-sm text-green-600 font-semibold';
+            feedback.classList.remove('hidden');
+            
+            // Feedback nach 3 Sekunden ausblenden
+            setTimeout(() => feedback.classList.add('hidden'), 3000);
         });
     </script>
 </body>
